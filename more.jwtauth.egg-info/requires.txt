@@ -1,0 +1,9 @@
+setuptools
+morepath > 0.9
+cryptography
+PyJWT >= 0.4.2
+
+[test]
+pytest >= 2.6.0
+pytest-cov
+WebTest
