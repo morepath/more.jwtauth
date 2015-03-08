@@ -29,7 +29,7 @@ The client will use their JWT to build a request signature and include it in the
 
 (NB depending on the number of claims in the JWT the token can get large. For all practical purposes, it should be kept short.)
 
-This plugin uses the PyJWT library for verifying JWTs:
+This plugin uses the PyJWT library from José Padilla for verifying JWTs:
 
 http://github.com/progrium/pyjwt
 
