@@ -42,7 +42,9 @@ Inspiration
 
 This module is inspired by:
 
-    * the pyramid_jwtauth package from Alex Kavanagh: https://github.com/ajkavanagh/pyramid_jwtauth
+* the pyramid_jwtauth package from Alex Kavanagh:
+https://github.com/ajkavanagh/pyramid_jwtauth
 
-    * the django-rest-framework-jwt package from José Padilla: https://github.com/GetBlimp/django-rest-framework-jwt
+* the django-rest-framework-jwt package from José Padilla:
+https://github.com/GetBlimp/django-rest-framework-jwt
 
