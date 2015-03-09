@@ -9,4 +9,5 @@ doc/build
 .coverage
 htmlcov
 .tox
-
+*.pyc
+__pycache__

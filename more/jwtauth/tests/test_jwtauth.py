@@ -18,12 +18,11 @@ def setup_module(module):
 
 
 def test_jwt_default_settings():
-    morepath.enable_implicit()
     config = morepath.setup()
+    config.scan(more.jwtauth)
 
     class app(JwtApp):
         testing_config = config
-    config.commit()
 
     assert settings().jwtauth.algorithm == "HS256"
     assert settings().jwtauth.auth_header_prefix == "JWT"
