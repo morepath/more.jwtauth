@@ -87,7 +87,10 @@ class JWTIdentityPolicy(IdentityPolicy):
           :attr:`morepath.security.NO_IDENTITY` if identity cannot
           be established.
         """
-        claims_set = parse_jwt
+        token = get_jwt(request)
+        if token is None:
+            return NO_IDENTITY
+        claims_set = decode_jwt(token)
         if claims_set is None:
             return NO_IDENTITY
         userid = get_userid(claims_set)
@@ -136,7 +139,7 @@ class JWTIdentityPolicy(IdentityPolicy):
         response.headers.add('WWW-Authenticate', 'JWT realm="morepath"')
 
 
-def decode_jwt(jwtauth_token):
+def decode_jwt(token):
     """Decode a JWTAuth token into its claims set.
 
     This method decodes the given JWT to provide the claims set.  The JWT can
@@ -158,23 +161,29 @@ def decode_jwt(jwtauth_token):
         leeway = settings().jwtauth.leeway
     else:
         leeway = 0
-    claims_set = jwt.decode(
-        jwtauth_token,
-        key,
-        verify_expiration=settings().jwtauth.verify_expiration,
-        leeway=leeway,
-        issuer=settings().jwtauth.issuer
-    )
+    try:
+        claims_set = jwt.decode(
+            token,
+            key,
+            verify_expiration=settings().jwtauth.verify_expiration,
+            leeway=leeway,
+            issuer=settings().jwtauth.issuer
+        )
+    except (jwt.DecodeError, jwt.ExpiredSignature):
+        return None
     return claims_set
 
 
-def create_claims_set(userid):
-    """Create the claims set based on the userid of the claimed identity and the settings.
+def create_claims_set(userid, extra_claims=None):
+    """Create the claims set based on the userid of the claimed identity, the settings and the extra_claims dictionary.
 
     The userid will be stored in the registry.settings.jwtauth.userid_claim (default: "sub").
     If registry.settings.jwtauth.expiration_delta is set it will be added to the current time
     and stored in the "exp" claim.
     If registry.settings.jwtauth.issuer is set, it get stored in the "iss" claim.
+    With the extra_claims dictionary you can provide additional claims. This can be registered claims like "nbf"
+    (the datetime before which the token should not be processed) and/or claims containing extra info
+    about the identity, which will be stored in the Identity object.
     """
     expiration_delta = settings().jwtauth.expiration_delta
     issuer = settings().jwtauth.issuer
@@ -184,14 +193,16 @@ def create_claims_set(userid):
         claims_set['exp'] = datetime.utcnow() + expiration_delta
     if issuer is not None:
         claims_set['iss'] = issuer
+    if extra_claims is not None:
+        claims_set.update(extra_claims)
     return claims_set
 
 
 def encode_jwt(claims_set):
     """Encode a JWT token based on the claims_set and the settings.
 
-    If available registry.settings.jwtauth.private_key is used as key.
-    Then the algorithm must be an RS* or EC* algorithm.
+    If available, registry.settings.jwtauth.private_key is used as key.
+    In this case the algorithm must be an RS* or EC* algorithm.
     If registry.settings.jwtauth.private_key is not set, registry.settings.jwtauth.master_secret is used.
     registry.settings.jwtauth.algorithm is used as algorithm.
     """
@@ -203,8 +214,8 @@ def encode_jwt(claims_set):
     if private_key is not None:
         key = private_key
     algorithm = settings().jwtauth.algorithm
-    jwtauth_token = jwt.encode(claims_set, key, algorithm)
-    return jwtauth_token.decode('utf-8')
+    token = jwt.encode(claims_set, key, algorithm)
+    return token.decode('utf-8')
     # TODO Don't know for what ".decode('utf-8')" is necessary.
     # django-rest-framework-jwt uses it and pyramid-jwt uses it only for Python 3.
 
@@ -238,8 +249,10 @@ def get_extra_claims(claims_set):
     return extra_claims
 
 
-def parse_jwt(request):
-    """Extract the authorisation header from the request, parse the JWT token and return the claims set.
+def get_jwt(request):
+    """Extract the JWT token from the authorisation header of the request.
+
+     Returns the JWT token or None, if the token cannot be extracted.
     """
     auth_header_prefix = settings().jwtauth.auth_header_prefix
     try:
@@ -253,27 +266,16 @@ def parse_jwt(request):
         return None
     if token is None:
         return None
-    try:
-        claims_set = decode_jwt(token)
-    except (jwt.DecodeError, jwt.ExpiredSignature):
-        return None
-
-    if claims_set is None:
-        return None
-    return claims_set
+    return token
 
 
-def serialize_jwt(request, response, userid, extra_claims=None):
-    """Create a claims set from userid and extra_claims, encode it to a JWT token
-    and put it in the Authorization field of the response header.
+def set_jwt(request, response, token):
+    """Set a JWT token in the Authorization field of the response header.
 
     This function can be called on response to a successful login request as a callback function
     after the view is processed using the morepath.Request.after() decorator.
-    extra_claims can contain a dictionary of extra identity claims, that will be stored in the Identity object.
+    Before you have to create a claims set and encode the JWT token.
     """
-    claims_set = create_claims_set(userid)
-    if extra_claims is not None:
-        claims_set.update(extra_claims)
-    jwtauth_token = encode_jwt(claims_set)
-    request.authorization = ('JWT', jwtauth_token)
+    auth_header_prefix = settings().jwtauth.auth_header_prefix
+    request.authorization = (auth_header_prefix, token)
     response.headers['Authorization'] = request.authorization  # TODO Not sure if this is right
