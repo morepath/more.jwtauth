@@ -6,7 +6,7 @@ This is a Morepath_ authentication extension for the JSON Web Token (JWT) Authen
 For more information about JWT, see:
 
 -  `JSON Web Token draft`_ - the official JWT draft
--  `Auth with JSON Web Tokens`_ - an interesting blog by José Padilla
+-  `Auth with JSON Web Tokens`_ - an interesting blog post by José Padilla
 
 To access resources using JWT Access Authentication, the client must have obtained a JWT to make signed requests to the server.
 The Token can be opaque to client, although, unless it is encrypted, the client can read the claims made in the token.
@@ -19,8 +19,8 @@ Inspiration
 
 This module is inspired by:
 
--  the pyramid_jwtauth_ package from Alex Kavanagh:
--  the django-rest-framework-jwt_ package from José Padilla:
+-  The pyramid_jwtauth_ package from Alex Kavanagh.
+-  The django-rest-framework-jwt_ package from José Padilla.
 
 
 .. _Morepath: http://morepath.readthedocs.org
