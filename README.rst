@@ -4,6 +4,7 @@ more.jwtauth: JWT-Auth integration for Morepath
 This is a Morepath_ authentication extension for the JSON Web Token (JWT) Authentication.
 
 For more information about JWT, see:
+
 -  `JSON Web Token draft`_ the official JWT draft
 -  `Auth with JSON Web Tokens`_ - an interesting blog by José Padilla
 
