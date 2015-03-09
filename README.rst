@@ -5,7 +5,7 @@ This is a Morepath_ authentication extension for the JSON Web Token (JWT) Authen
 
 For more information about JWT, see:
 
--  `JSON Web Token draft`_ the official JWT draft
+-  `JSON Web Token draft`_ - the official JWT draft
 -  `Auth with JSON Web Tokens`_ - an interesting blog by José Padilla
 
 To access resources using JWT Access Authentication, the client must have obtained a JWT to make signed requests to the server.
