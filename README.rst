@@ -43,11 +43,9 @@ currently supports:
 * RS384 - RSASSA-PKCS1-v1_5 signature algorithm using SHA-384 hash algorithm
 * RS512 - RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
 
-          if you have several related apps with exclusive user audience.
-          Default is None (do not check iss on JWT).
 
-Additional Settings
--------------------
+Settings
+--------
 
 There are some additional settings that you can override. Here are all the defaults::
 
