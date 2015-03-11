@@ -33,15 +33,32 @@ Algorithms
 The JWT spec supports several algorithms for cryptographic signing. This library
 currently supports:
 
-* HS256 - HMAC using SHA-256 hash algorithm (default)
-* HS384 - HMAC using SHA-384 hash algorithm
-* HS512 - HMAC using SHA-512 hash algorithm
-* ES256 - ECDSA signature algorithm using SHA-256 hash algorithm
-* ES384 - ECDSA signature algorithm using SHA-384 hash algorithm
-* ES512 - ECDSA signature algorithm using SHA-512 hash algorithm
-* RS256 - RSASSA-PKCS1-v1_5 signature algorithm using SHA-256 hash algorithm
-* RS384 - RSASSA-PKCS1-v1_5 signature algorithm using SHA-384 hash algorithm
-* RS512 - RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
+HS256
+   HMAC using SHA-256 hash algorithm (default)
+
+HS384
+   HMAC using SHA-384 hash algorithm
+
+HS512
+   HMAC using SHA-512 hash algorithm
+
+ES256
+   ECDSA signature algorithm using SHA-256 hash algorithm
+
+ES384
+   ECDSA signature algorithm using SHA-384 hash algorithm
+
+ES512
+   ECDSA signature algorithm using SHA-512 hash algorithm
+
+RS256
+   RSASSA-PKCS1-v1_5 signature algorithm using SHA-256 hash algorithm
+
+RS384
+   RSASSA-PKCS1-v1_5 signature algorithm using SHA-384 hash algorithm
+
+RS512
+   RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
 
 
 Settings
