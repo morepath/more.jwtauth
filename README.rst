@@ -70,35 +70,56 @@ There are some additional settings that you can override. Here are all the defau
 
 The following settings are available:
 
--  **master_secret:**  A secret known only by the server, used for the default HMAC (HS*) algorithm.
+master_secret
+   A secret known only by the server, used for the default HMAC (HS*) algorithm.
+   Default is None.
 
--  **private_key:**  An RSA or an Elliptic Curve private_key used for the RSA (RS*) or EC (EC*) algorithms.
+private_key
+   An RSA or an Elliptic Curve private_key used for the RSA (RS*) or EC (EC*) algorithms.
+   Default is None.
 
--  **private_key_file:** A file holding an RSA encoded (PEM/DER) or an Elliptic Curve private_key.
+private_key_file
+   A file holding an RSA encoded (PEM/DER) or an Elliptic Curve private_key.
+   Default is None.
 
--  **public_key:**  An RSA or an Elliptic Curve public_key used for the RSA (RS*) or EC (EC*) algorithms.
+public_key
+   An RSA or an Elliptic Curve public_key used for the RSA (RS*) or EC (EC*) algorithms.
+   Default is None.
 
--  **public_key_file:** A file holding an RSA encoded (PEM/DER) or an Elliptic Curve public_key.
+public_key_file
+   A file holding an RSA encoded (PEM/DER) or an Elliptic Curve public_key.
+   Default is None.
 
--  **algorithm:**  The algorithm used to sign the key (defaults to HS256).
+algorithm
+   The algorithm used to sign the key.
+   Defaults is HS256.
 
--  **expiration_delta:** Time delta from now until the token will expire. Default is 6 hours, set to None to disable.
+expiration_delta
+   Time delta from now until the token will expire. Set to None to disable.
+   Default is 6 hours.
 
--  **leeway:**  The leeway, which allows you to validate an expiration time which is in the past, but not very far.
-To use as a datetime.timedelta. Defaults is None.
+leeway
+   The leeway, which allows you to validate an expiration time which is in the past, but not very far.
+   To use as a datetime.timedelta.
+   Defaults is None.
 
--  **verify_expiration:** Default is True. If you set it to False and expiration_delta is not None,
-you should verify the "exp" claim by yourself and if it is expired you can either refresh the token
-or you must reject it.
+verify_expiration
+   If you set it to False and expiration_delta is not None, you should verify the "exp" claim by yourself
+   and if it is expired you can either refresh the token or you must reject it.
+   Default is True.
 
--  **issuer:** This is a string that will be checked against the iss claim of the token. You can use this e.g.
-if you have several related apps with exclusive user audience.
-Default is None (do not check iss on JWT).
+issuer
+   This is a string that will be checked against the iss claim of the token.
+   You can use this e.g. if you have several related apps with exclusive user audience.
+   Default is None (do not check iss on JWT).
 
--  **auth_header_prefix:** You can modify the Authorization header value prefix that is required to be sent together
-with the token. The default value is JWT. Another common value used for tokens is Bearer.
+auth_header_prefix
+   You can modify the Authorization header value prefix that is required to be sent together with the token.
+   The default value is JWT. Another common value used for tokens is Bearer.
 
--  **userid_claim:** The claim, which contains the user id. The default claim is 'sub'.
+userid_claim
+   The claim, which contains the user id.
+   The default claim is 'sub'.
 
 The library takes either a master_secret or private_key/public_key pair.
 In the later case the algorithm must be an RS* or EC* version.
