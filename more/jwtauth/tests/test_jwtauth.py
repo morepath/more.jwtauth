@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
+import datetime
 import morepath
-from morepath.request import Response
-from morepath import settings
-from morepath.security import (Identity, NO_IDENTITY)
+from morepath import (Response, Request, settings, Identity, NO_IDENTITY)
 
 from more.jwtauth import JwtApp
 from more.jwtauth.main import JWTIdentityPolicy
-import more.jwtauth
-import base64
+import more.jwtauth.main
+import webob
 from webob.exc import HTTPForbidden
 from webtest import TestApp as Client
 import pytest
@@ -21,20 +20,256 @@ def test_jwt_default_settings():
     config = morepath.setup()
     config.scan(more.jwtauth)
 
-    class app(JwtApp):
+    class App(JwtApp):
         testing_config = config
 
-    assert settings().jwtauth.algorithm == "HS256"
-    assert settings().jwtauth.auth_header_prefix == "JWT"
-    assert settings().jwtauth.master_secret is None
+    config.commit()
+    lookup = App().registry.lookup
+
+    assert settings(lookup=lookup).jwtauth.algorithm == "HS256"
+    assert settings(lookup=lookup).jwtauth.auth_header_prefix == "JWT"
+    assert settings(lookup=lookup).jwtauth.master_secret is None
+
+
+def test_jwt_custom_settings():
+    config = morepath.setup()
+    config.scan(more.jwtauth)
+
+    class App(JwtApp):
+        testing_config = config
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'public_key': 'MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBWcJwPEAnS/k4kFgUhxNF7J0SQQhZG+nNgy+/mXwhQ5PZIUmId1a1TjkNXiKzv6DpttBqduHbz/V0EtH+QfWy0B4BhZ5MnTyDGjcz1DQqKdexebhzobbhSIZjpYd5aU48o9rXp/OnAnrajddpGsJ0bNf4rtMLBqFYJN6LOslAB7xTBRg=',
+            'algorithm': "ES256",
+            'leeway': 20
+        }
+
+    config.commit()
+    lookup = App().registry.lookup
+
+    assert settings(lookup=lookup).jwtauth.algorithm == "ES256"
+    assert settings(lookup=lookup).jwtauth.master_secret is None
+    assert settings(lookup=lookup).jwtauth.leeway == 20
+    assert settings(lookup=lookup).jwtauth.public_key == 'MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBWcJwPEAnS/k4kFgUhxNF7J0SQQhZG+nNgy+/mXwhQ5PZIUmId1a1TjkNXiKzv6DpttBqduHbz/V0EtH+QfWy0B4BhZ5MnTyDGjcz1DQqKdexebhzobbhSIZjpYd5aU48o9rXp/OnAnrajddpGsJ0bNf4rtMLBqFYJN6LOslAB7xTBRg='
+
+
+def test_encode_decode():
+    config = morepath.setup()
+    config.scan(more.jwtauth)
+
+    class App(JwtApp):
+        testing_config = config
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'master_secret': 'secret',
+        }
+
+    config.commit()
+    lookup = App().registry.lookup
+    claims_set = {
+        'sub': 'user'
+    }
+    token = more.jwtauth.main.encode_jwt(claims_set, settings(lookup=lookup).jwtauth)
+    claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
+
+    assert claims_set_decoded == claims_set
+
+
+def test_encode_decode_with_unicode():
+    config = morepath.setup()
+    config.scan(more.jwtauth)
+
+    class App(JwtApp):
+        testing_config = config
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'master_secret': 'sëcret',
+        }
+
+    config.commit()
+    lookup = App().registry.lookup
+    claims_set = {
+        'sub': 'user'
+    }
+    token = more.jwtauth.main.encode_jwt(claims_set, settings(lookup=lookup).jwtauth)
+    claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
+
+    assert claims_set_decoded == claims_set
+
+
+def test_encode_decode_with_es256():
+    config = morepath.setup()
+    config.scan(more.jwtauth)
+
+    class App(JwtApp):
+        testing_config = config
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'algorithm': "ES256",
+            'private_key_file': 'more/jwtauth/tests/keys/testkey_ec',
+            'public_key_file': 'more/jwtauth/tests/keys/testkey_ec.pub',
+        }
+
+    config.commit()
+    lookup = App().registry.lookup
+    claims_set = {
+        'sub': 'user'
+    }
+    token = more.jwtauth.main.encode_jwt(claims_set, settings(lookup=lookup).jwtauth)
+    claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
+
+    assert claims_set_decoded == claims_set
+
+
+def test_encode_decode_with_rs512():
+    config = morepath.setup()
+    config.scan(more.jwtauth)
+
+    class App(JwtApp):
+        testing_config = config
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'algorithm': "RS512",
+            'private_key_file': 'more/jwtauth/tests/keys/testkey_rsa',
+            'public_key_file': 'more/jwtauth/tests/keys/testkey_rsa.pub',
+        }
+
+    config.commit()
+    lookup = App().registry.lookup
+    claims_set = {
+        'sub': 'user'
+    }
+    token = more.jwtauth.main.encode_jwt(claims_set, settings(lookup=lookup).jwtauth)
+    claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
+
+    assert claims_set_decoded == claims_set
+
+
+def test_create_claim_and_encode_decode_and_get_userid_and_get_extra_claims():
+    config = morepath.setup()
+    config.scan(more.jwtauth)
+
+    class App(JwtApp):
+        testing_config = config
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'master_secret': 'secret',
+        }
+
+    config.commit()
+    lookup = App().registry.lookup
+    userid = 'user'
+    extra_claims = {
+        'email': 'user@example.com',
+        'role': 'admin'
+    }
+    claims_set = more.jwtauth.main.create_claims_set(userid, settings(lookup=lookup).jwtauth, extra_claims)
+    token = more.jwtauth.main.encode_jwt(claims_set, settings(lookup=lookup).jwtauth)
+    claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
+
+    assert userid == more.jwtauth.main.get_userid(claims_set_decoded, settings(lookup=lookup).jwtauth)
+    assert extra_claims == more.jwtauth.main.get_extra_claims(claims_set_decoded, settings(lookup=lookup).jwtauth)
+
+
+def test_create_claim_and_encode_decode_expired():
+    config = morepath.setup()
+    config.scan(more.jwtauth)
+
+    class App(JwtApp):
+        testing_config = config
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'master_secret': 'secret',
+            'expiration_delta': datetime.timedelta(seconds=-2),
+        }
+
+    config.commit()
+    lookup = App().registry.lookup
+    userid = 'user'
+    claims_set = more.jwtauth.main.create_claims_set(userid, settings(lookup=lookup).jwtauth)
+    token = more.jwtauth.main.encode_jwt(claims_set, settings(lookup=lookup).jwtauth)
+    claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
+
+    assert claims_set_decoded is None
+
+
+def test_create_claim_and_encode_decode_expired_but_with_leeway():
+    config = morepath.setup()
+    config.scan(more.jwtauth)
+
+    class App(JwtApp):
+        testing_config = config
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'master_secret': 'secret',
+            'expiration_delta': datetime.timedelta(seconds=-2),
+            'leeway': 3
+        }
+
+    config.commit()
+    lookup = App().registry.lookup
+    userid = 'user'
+    claims_set = more.jwtauth.main.create_claims_set(userid, settings(lookup=lookup).jwtauth)
+    token = more.jwtauth.main.encode_jwt(claims_set, settings(lookup=lookup).jwtauth)
+    claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
+
+    assert more.jwtauth.main.get_userid(claims_set_decoded, settings(lookup=lookup).jwtauth) == userid
+
+
+
+def test_authorization():
+    config = morepath.setup()
+    config.scan(more.jwtauth)
+
+    class App(JwtApp):
+        testing_config = config
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'master_secret': 'secret',
+        }
+
+
+    config.commit()
+    request = App().request(webob.Request.blank(path='').environ)
+    lookup = App().registry.lookup
+    auth_header = more.jwtauth.main.set_jwt_auth_header(request, 'user', settings(lookup=lookup).jwtauth)
+    request.authorization = auth_header
+    token = more.jwtauth.main.get_jwt(request, settings(lookup=lookup).jwtauth)
+    claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
+
+    assert more.jwtauth.main.get_userid(claims_set_decoded, settings(lookup=lookup).jwtauth) == 'user'
 
 
 def test_jwt_identity_policy():
     config = morepath.setup()
     config.scan(more.jwtauth)
 
-    class app(JwtApp):
+    class App(JwtApp):
         testing_config = config
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'master_secret': 'secret',
+        }
 
     class Model(object):
         def __init__(self, id):
@@ -43,29 +278,29 @@ def test_jwt_identity_policy():
     class Permission(object):
         pass
 
-    @app.path(model=Model, path='{id}',
+    @App.path(model=Model, path='{id}',
               variables=lambda model: {'id': model.id})
     def get_model(id):
         return Model(id)
 
-    @app.permission_rule(model=Model, permission=Permission)
+    @App.permission_rule(model=Model, permission=Permission)
     def get_permission(identity, model, permission):
-        return identity.userid == 'user' and identity.password == 'secret'
+        return identity.userid == 'user'
 
-    @app.view(model=Model, permission=Permission)
+    @App.view(model=Model, permission=Permission)
     def default(self, request):
         return "Model: %s" % self.id
 
-    @app.identity_policy()
+    @App.identity_policy()
     def policy():
         return JWTIdentityPolicy()
 
-    @app.verify_identity()
+    @App.verify_identity()
     def verify_identity(identity):
         assert identity is not NO_IDENTITY
         return True
 
-    @app.view(model=HTTPForbidden)
+    @App.view(model=HTTPForbidden)
     def make_unauthorized(self, request):
         @request.after
         def set_status_code(response):
@@ -74,133 +309,47 @@ def test_jwt_identity_policy():
 
     config.commit()
 
-    c = Client(app())
+    c = Client(App())
 
     response = c.get('/foo', status=401)
 
-    headers = {'Authorization': 'JWT ' +
-               str(base64.b64encode(b'user:wrong').decode())}
+    headers = {'Authorization': str('JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ3cm9uZyJ9.mUHfZIsrGyUHconbskiKNIS6FkNrt3An-OwIbWBb-CA')}
     response = c.get('/foo', headers=headers, status=401)
 
-    headers = {'Authorization': 'JWT ' +
-               str(base64.b64encode(b'user:secret').decode())}
+    headers = {'Authorization': str('JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.8jVjALlPRYpE03sMD8kuqG9D4RSih5NjiISNZ-wO3oY')}
     response = c.get('/foo', headers=headers)
     assert response.body == b'Model: foo'
-
-
-def test_jwt_identity_policy_errors():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
-
-    class app(JwtApp):
-        testing_config = config
-
-    class Model(object):
-        def __init__(self, id):
-            self.id = id
-
-    class Permission(object):
-        pass
-
-    @app.path(model=Model, path='{id}',
-              variables=lambda model: {'id': model.id})
-    def get_model(id):
-        return Model(id)
-
-    @app.permission_rule(model=Model, permission=Permission)
-    def get_permission(identity, model, permission):
-        return identity.userid == 'user' and identity.password == u'sëcret'
-
-    @app.view(model=Model, permission=Permission)
-    def default(self, request):
-        return "Model: %s" % self.id
-
-    @app.identity_policy()
-    def policy():
-        return JWTIdentityPolicy()
-
-    @app.verify_identity()
-    def verify_identity(identity):
-        return True
-
-    config.commit()
-
-    c = Client(app())
-
-    response = c.get('/foo', status=403)
-
-    headers = {'Authorization': 'Something'}
-    response = c.get('/foo', headers=headers, status=403)
-
-    headers = {'Authorization': 'Something other'}
-    response = c.get('/foo', headers=headers, status=403)
-
-    headers = {'Authorization': 'JWT ' + 'nonsense'}
-    response = c.get('/foo', headers=headers, status=403)
-
-    headers = {'Authorization': 'JWT ' + 'nonsense1'}
-    response = c.get('/foo', headers=headers, status=403)
-
-    # fallback to utf8
-    headers = {
-        'Authorization': 'JWT ' + str(base64.b64encode(
-            u'user:sëcret'.encode('utf8')).decode())}
-    response = c.get('/foo', headers=headers)
-    assert response.body == b'Model: foo'
-
-    # fallback to latin1
-    headers = {
-        'Authorization': 'JWT ' + str(base64.b64encode(
-            u'user:sëcret'.encode('latin1')).decode())}
-    response = c.get('/foo', headers=headers)
-    assert response.body == b'Model: foo'
-
-    # unknown encoding
-    headers = {
-        'Authorization': 'JWT ' + str(base64.b64encode(
-            u'user:sëcret'.encode('cp500')).decode())}
-    response = c.get('/foo', headers=headers, status=403)
-
-    headers = {
-        'Authorization': 'JWT ' + str(base64.b64encode(
-            u'usersëcret'.encode('utf8')).decode())}
-    response = c.get('/foo', headers=headers, status=403)
-
-    headers = {
-        'Authorization': 'JWT ' + str(base64.b64encode(
-            u'user:sëcret:'.encode('utf8')).decode())}
-    response = c.get('/foo', headers=headers, status=403)
 
 
 def test_jwt_remember():
     config = morepath.setup()
     config.scan(more.jwtauth)
 
-    class app(JwtApp):
+    class App(JwtApp):
         testing_config = config
 
-    @app.path(path='{id}',
+    @App.path(path='{id}',
               variables=lambda model: {'id': model.id})
     class Model(object):
         def __init__(self, id):
             self.id = id
 
-    @app.view(model=Model)
+    @App.view(model=Model)
     def default(self, request):
-        # will not actually do anything as it's a no-op for basic
+        # will not actually do anything as it's a no-op for JWT
         # auth, but at least won't crash
         response = Response()
         morepath.remember_identity(response, request, Identity('foo'),
                                   lookup=request.lookup)
         return response
 
-    @app.identity_policy()
+    @App.identity_policy()
     def policy():
         return JWTIdentityPolicy()
 
     config.commit()
 
-    c = Client(app())
+    c = Client(App())
 
     response = c.get('/foo', status=200)
     assert response.body == b''
@@ -210,29 +359,29 @@ def test_jwt_forget():
     config = morepath.setup()
     config.scan(more.jwtauth)
 
-    class app(JwtApp):
+    class App(JwtApp):
         testing_config = config
 
-    @app.path(path='{id}')
+    @App.path(path='{id}')
     class Model(object):
         def __init__(self, id):
             self.id = id
 
-    @app.view(model=Model)
+    @App.view(model=Model)
     def default(self, request):
-        # will not actually do anything as it's a no-op for basic
+        # will not actually do anything as it's a no-op for JWT
         # auth, but at least won't crash
         response = Response(content_type='text/plain')
         morepath.forget_identity(response, request, lookup=request.lookup)
         return response
 
-    @app.identity_policy()
+    @App.identity_policy()
     def policy():
         return JWTIdentityPolicy()
 
     config.commit()
 
-    c = Client(app())
+    c = Client(App())
 
     response = c.get('/foo', status=200)
     assert response.body == b''
@@ -240,8 +389,5 @@ def test_jwt_forget():
     assert sorted(response.headers.items()) == [
         ('Content-Length', '0'),
         ('Content-Type', 'text/plain; charset=UTF-8'),
-        ('WWW-Authenticate', 'JWT'),
+        ('WWW-Authenticate', 'JWT realm="morepath"'),
     ]
-
-
-
