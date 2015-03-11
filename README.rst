@@ -109,13 +109,13 @@ Inspiration
 
 This module is inspired by:
 
--  The **pyramid_jwtauth_** package from Alex Kavanagh.
--  The **django-rest-framework-jwt_** package from José Padilla.
+-  The `**pyramid_jwtauth**`_ package from Alex Kavanagh.
+-  The `**django-rest-framework-jwt**`_ package from José Padilla.
 
 
 .. _Morepath: http://morepath.readthedocs.org
 .. _JSON Web Token draft: http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html
 .. _Auth with JSON Web Tokens: http://jpadilla.com/post/73791304724/auth-with-json-web-tokens
 .. _PyJWT library: http://github.com/progrium/pyjwt
-.. _pyramid_jwtauth: https://github.com/ajkavanagh/pyramid_jwtauth
-.. _django-rest-framework-jwt: https://github.com/GetBlimp/django-rest-framework-jwt
+.. _**pyramid_jwtauth**: https://github.com/ajkavanagh/pyramid_jwtauth
+.. _**django-rest-framework-jwt**: https://github.com/GetBlimp/django-rest-framework-jwt
