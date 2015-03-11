@@ -47,7 +47,7 @@ currently supports:
 Settings
 --------
 
-There are some additional settings that you can override. Here are all the defaults::
+There are some settings that you can override. Here are all the defaults::
 
     @JwtApp.setting_section(section="jwtauth")
     def get_jwtauth_settings():
