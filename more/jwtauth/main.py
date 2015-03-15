@@ -1,4 +1,4 @@
-import sys
+from sys import version_info
 import datetime
 
 import morepath
@@ -217,7 +217,7 @@ def encode_jwt(claims_set, settings_jwtauth):
         key = private_key
     algorithm = settings_jwtauth.algorithm
     token = jwt.encode(claims_set, key, algorithm)
-    if sys.version_info >= (3, 0, 0):
+    if version_info >= (3, 0, 0):
         token = token.decode(encoding='UTF-8')
     return token
 
