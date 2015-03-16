@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 import datetime
 import morepath
-from morepath import (Response, Request, settings, Identity, NO_IDENTITY)
+from morepath import (Response, settings, Identity, NO_IDENTITY)
 
 from more.jwtauth import JwtApp
 from more.jwtauth.main import JWTIdentityPolicy
 import more.jwtauth.main
-import webob
+from webob import Request
 from webob.exc import HTTPForbidden
 from webtest import TestApp as Client
-import pytest
 
 
 def setup_module(module):
@@ -232,7 +231,6 @@ def test_create_claim_and_encode_decode_expired_but_with_leeway():
     assert more.jwtauth.main.get_userid(claims_set_decoded, settings(lookup=lookup).jwtauth) == userid
 
 
-
 def test_authorization():
     config = morepath.setup()
     config.scan(more.jwtauth)
@@ -246,9 +244,8 @@ def test_authorization():
             'master_secret': 'secret',
         }
 
-
     config.commit()
-    request = App().request(webob.Request.blank(path='').environ)
+    request = App().request(Request.blank(path='').environ)
     lookup = App().registry.lookup
     auth_header = more.jwtauth.main.set_jwt_auth_header(request, 'user', settings(lookup=lookup).jwtauth)
     request.authorization = auth_header
@@ -340,7 +337,7 @@ def test_jwt_remember():
         # auth, but at least won't crash
         response = Response()
         morepath.remember_identity(response, request, Identity('foo'),
-                                  lookup=request.lookup)
+                                   lookup=request.lookup)
         return response
 
     @App.identity_policy()
