@@ -7,7 +7,7 @@ from more.jwtauth import JwtApp
 from more.jwtauth.main import JWTIdentityPolicy
 import more.jwtauth.main
 from webob import Request
-from webob.exc import HTTPForbidden
+from webob.exc import HTTPForbidden, HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
 
 
@@ -247,9 +247,67 @@ def test_authorization():
     config.commit()
     request = App().request(Request.blank(path='').environ)
     lookup = App().registry.lookup
-    auth_header = more.jwtauth.main.set_jwt_auth_header(request, 'user', settings(lookup=lookup).jwtauth)
+    auth_header = more.jwtauth.main.set_jwt_auth_header(request, 'user')
     request.authorization = auth_header
     token = more.jwtauth.main.get_jwt(request, settings(lookup=lookup).jwtauth)
+    claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
+
+    assert more.jwtauth.main.get_userid(claims_set_decoded, settings(lookup=lookup).jwtauth) == 'user'
+
+
+def test_login():
+    config = morepath.setup()
+    config.scan(more.jwtauth)
+
+    class App(JwtApp):
+        testing_config = config
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'master_secret': 'secret',
+            'expiration_delta': None,
+        }
+
+    class Login(object):
+        pass
+
+    @App.path(model=Login, path='login')
+    def get_login():
+        return Login()
+
+    @App.json(model=Login, request_method='POST')
+    def login(self, request):
+        username = request.POST['username']
+        password = request.POST['password']
+        if not user_has_password(username, password):
+            raise HTTPProxyAuthenticationRequired('Invalid username/password')
+        @request.after
+        def set_auth_header(response):
+            auth_header = more.jwtauth.main.set_jwt_auth_header(request, username)
+            response.headers['Authorization'] = auth_header
+        return {
+            'username': username,
+        }
+
+    def user_has_password(username, password):
+        return username == 'user' and password == 'password'
+
+    config.commit()
+    lookup = App().registry.lookup
+    c = Client(App())
+    r = c.post('/login', 'username=user&password=false', status=407)
+    r = c.post('/login', 'username=not_exists&password=password', status=407)
+    r = c.post('/login', 'username=user&password=password')
+
+    assert r.json == {
+        'username': 'user',
+    }
+
+    assert r.headers['Authorization'] == 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' \
+                                         'eyJzdWIiOiJ1c2VyIn0.8jVjALlPRYpE03sMD8kuqG9D4RSih5NjiISNZ-wO3oY'
+
+    authtype, token = r.headers['Authorization'].split(' ', 1)
     claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
 
     assert more.jwtauth.main.get_userid(claims_set_decoded, settings(lookup=lookup).jwtauth) == 'user'
@@ -310,10 +368,12 @@ def test_jwt_identity_policy():
 
     response = c.get('/foo', status=401)
 
-    headers = {'Authorization': str('JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ3cm9uZyJ9.mUHfZIsrGyUHconbskiKNIS6FkNrt3An-OwIbWBb-CA')}
+    headers = {'Authorization': 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ3cm9uZyJ9.'
+                                'mUHfZIsrGyUHconbskiKNIS6FkNrt3An-OwIbWBb-CA'}
     response = c.get('/foo', headers=headers, status=401)
 
-    headers = {'Authorization': str('JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.8jVjALlPRYpE03sMD8kuqG9D4RSih5NjiISNZ-wO3oY')}
+    headers = {'Authorization': 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.'
+                                '8jVjALlPRYpE03sMD8kuqG9D4RSih5NjiISNZ-wO3oY'}
     response = c.get('/foo', headers=headers)
     assert response.body == b'Model: foo'
 
