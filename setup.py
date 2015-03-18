@@ -22,8 +22,8 @@ setup(name='more.jwtauth',
       install_requires=[
           'setuptools',
           'morepath > 0.9',
-          'cryptography',
-          'PyJWT >= 0.4.2'
+          'PyJWT >= 1.0.0',
+          'cryptography >= 0.8'
       ],
       extras_require=dict(
           test=['pytest >= 2.6.0',
