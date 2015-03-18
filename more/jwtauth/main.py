@@ -1,4 +1,4 @@
-import sys
+from sys import version_info
 import datetime
 
 import morepath
@@ -217,7 +217,7 @@ def encode_jwt(claims_set, settings_jwtauth):
         key = private_key
     algorithm = settings_jwtauth.algorithm
     token = jwt.encode(claims_set, key, algorithm)
-    if sys.version_info >= (3, 0, 0):
+    if version_info >= (3, 0, 0):
         token = token.decode(encoding='UTF-8')
     return token
 
@@ -271,14 +271,15 @@ def get_jwt(request, settings_jwtauth):
     return token
 
 
-def set_jwt_auth_header(request, userid, settings_jwtauth, extra_claims=None):
+def set_jwt_auth_header(request, userid, extra_claims=None):
     """Create a JWT token and return it as the Authorization field of the response header.
 
     This function can be called on response to a successful login request as a callback function
     after the view is processed using the morepath.Request.after() decorator.
     """
+    settings_jwtauth = morepath.settings(lookup=request.lookup).jwtauth
     auth_header_prefix = settings_jwtauth.auth_header_prefix
     claims_set = create_claims_set(userid, settings_jwtauth, extra_claims)
     token = encode_jwt(claims_set, settings_jwtauth)
-    request.authorization = (auth_header_prefix, token)
-    return request.authorization
+    return '%s %s' % (auth_header_prefix, token)
+
