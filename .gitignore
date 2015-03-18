@@ -5,6 +5,7 @@ parts
 develop-eggs
 src
 .mr.developer.cfg
+*.egg-info
 doc/build
 .coverage
 htmlcov
