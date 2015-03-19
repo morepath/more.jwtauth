@@ -255,50 +255,6 @@ def test_authorization():
     assert more.jwtauth.main.get_userid(claims_set_decoded, settings(lookup=lookup).jwtauth) == 'user'
 
 
-def test_encode_jwt_raw():
-    import jwt
-    from sys import version_info
-    claims_set = {
-        'sub': 'user'
-    }
-    key = 'secret'
-    token = jwt.encode(claims_set, key)
-    if version_info >= (3, 0, 0):
-        token = token.decode(encoding='UTF-8')
-
-    assert token == 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.' \
-                    '8jVjALlPRYpE03sMD8kuqG9D4RSih5NjiISNZ-wO3oY'
-
-
-def test_encode_jwt():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
-
-    class App(JwtApp):
-        testing_config = config
-
-    @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
-        return {
-            'master_secret': 'secret',
-            'expiration_delta': None,
-        }
-
-    config.commit()
-    lookup = App().registry.lookup
-    claims_set = {
-        'sub': 'user'
-    }
-    token = more.jwtauth.main.encode_jwt(claims_set, settings(lookup=lookup).jwtauth)
-
-    assert token == 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.' \
-                    '8jVjALlPRYpE03sMD8kuqG9D4RSih5NjiISNZ-wO3oY'
-
-    claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
-
-    assert more.jwtauth.main.get_userid(claims_set_decoded, settings(lookup=lookup).jwtauth) == 'user'
-
-
 def test_login():
     config = morepath.setup()
     config.scan(more.jwtauth)
