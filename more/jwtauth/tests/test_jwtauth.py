@@ -304,7 +304,10 @@ def test_login():
         'username': 'user',
     }
 
-    expected_token = more.jwtauth.main.encode_jwt({'sub': 'user'}, settings(lookup=lookup).jwtauth)
+    claims_set = {
+        'sub': 'user'
+    }
+    expected_token = more.jwtauth.main.encode_jwt(claims_set, settings(lookup=lookup).jwtauth)
     assert r.headers['Authorization'] == '%s %s' % ('JWT', expected_token)
 
     authtype, token = r.headers['Authorization'].split(' ', 1)
