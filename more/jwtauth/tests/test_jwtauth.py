@@ -10,6 +10,8 @@ from webob import Request
 from webob.exc import HTTPForbidden, HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
 
+import jwt
+
 
 def setup_module(module):
     morepath.disable_implicit()
@@ -256,6 +258,15 @@ def test_authorization():
 
 
 def test_encode_jwt():
+    claims_set = {
+        'sub': 'user'
+    }
+    key = 'secret'
+    token_raw = jwt.encode(claims_set, key)
+
+    assert token_raw == 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.' \
+                    '8jVjALlPRYpE03sMD8kuqG9D4RSih5NjiISNZ-wO3oY'
+
     config = morepath.setup()
     config.scan(more.jwtauth)
 
@@ -265,15 +276,12 @@ def test_encode_jwt():
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
         return {
-            'master_secret': 'secret',
+            'master_secret': key,
             'expiration_delta': None,
         }
 
     config.commit()
     lookup = App().registry.lookup
-    claims_set = {
-        'sub': 'user'
-    }
     token = more.jwtauth.main.encode_jwt(claims_set, settings(lookup=lookup).jwtauth)
 
     assert token == 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.' \
