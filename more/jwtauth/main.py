@@ -275,7 +275,7 @@ def set_jwt_auth_header(request, userid, extra_claims=None):
     """Create a JWT token and return it as the Authorization field of the response header.
 
     This function can be called on response to a successful login request as a callback function
-    after the view is processed using the morepath.Request.after() decorator.
+    after the view is processed, using the morepath.Request.after() decorator.
     """
     settings_jwtauth = morepath.settings(lookup=request.lookup).jwtauth
     auth_header_prefix = settings_jwtauth.auth_header_prefix

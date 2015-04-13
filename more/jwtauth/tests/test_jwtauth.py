@@ -247,7 +247,7 @@ def test_authorization():
     config.commit()
     request = App().request(Request.blank(path='').environ)
     lookup = App().registry.lookup
-    auth_header = more.jwtauth.main.set_jwt_auth_header(request, 'user')
+    auth_header = more.jwtauth.set_jwt_auth_header(request, 'user')
     request.authorization = auth_header
     token = more.jwtauth.main.get_jwt(request, settings(lookup=lookup).jwtauth)
     claims_set_decoded = more.jwtauth.main.decode_jwt(token, settings(lookup=lookup).jwtauth)
@@ -284,7 +284,7 @@ def test_login():
             raise HTTPProxyAuthenticationRequired('Invalid username/password')
         @request.after
         def set_auth_header(response):
-            auth_header = more.jwtauth.main.set_jwt_auth_header(request, username)
+            auth_header = more.jwtauth.set_jwt_auth_header(request, username)
             response.headers['Authorization'] = auth_header
         return {
             'username': username,
