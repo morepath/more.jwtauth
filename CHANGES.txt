@@ -4,8 +4,7 @@ CHANGES
 0.2 (unreleased)
 =====================
 
-- Integrate the set_jwt_auth_header function into the identity policy as remember method
-  and add the extra claims to settings.
+- Integrate the set_jwt_auth_header function into the identity policy as remember method.
 
 - Add support for PS256, PS384, and PS512 algorithms.
 

@@ -55,14 +55,9 @@ and pass them to JWTIdentityPolicy::
         return {
             # set a key or key file
             'master_secret': 'secret',
+
             # adjust the settings, which you need
-            'leeway': 10,
-            # you can add some extra information about the identity
-            'extra_claims': {
-                'fullname': 'Harry Potter',
-                'email': 'harry@potter.com',
-                'role': 'wizard'
-            }
+            'leeway': 10
         }
 
 
@@ -74,10 +69,47 @@ and pass them to JWTIdentityPolicy::
 
     @App.verify_identity()
     def verify_identity(identity):
+
         # As we use a token based authentication we can trust the claimed identity.
         return True
 
-The login we can do in a standard Morepath way but the logout should be handled by the client.
+The login can be done in the standard Morepath way. You can add extra information about the identity,
+which will be stored in the JWT token and can be accessed through the morepath.Identity object::
+
+    class Login(object):
+        pass
+
+
+    @App.path(model=Login, path='login')
+    def get_login():
+        return Login()
+
+
+    @App.view(model=Login, request_method='POST')
+    def login(self, request):
+        username = request.POST['username']
+        password = request.POST['password']
+
+        # Here you get some extra user information.
+        fullname = request.POST['fullname']
+        email = request.POST['email']
+        role = request.POST['role']
+
+        # Do some password validation.
+        if not user_has_password(username, password):
+            raise HTTPProxyAuthenticationRequired('Invalid username/password')
+
+        @request.after
+        def remember(response):
+
+            # We pass the extra info to the identity object.
+            identity = morepath.Identity(username, fullname=fullname, email=email, role=role)
+            morepath.remember_identity(response, request, identity)
+
+        return "You're logged in."  # or something more fancy
+
+Don't use reserved claim names as "iss", "aud", "exp", "nbf", "iat", "jti" and
+the user_id_claim (default: "sub", see settings). They will be silently ignored.
 
 Advanced: For testing or if we want to use some methods of the JWTIdentityPolicy class directly we can
           pass the settings as arguments to the class::
@@ -146,7 +178,6 @@ There are some settings that you can override. Here are all the defaults::
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
         return {
-            'extra_claims': None,
             'master_secret': None,
             'private_key': None,
             'private_key_file': None,
@@ -162,13 +193,6 @@ There are some settings that you can override. Here are all the defaults::
         }
 
 The following settings are available:
-
-extra_claims
-   A dictionary which contains extra information about the identity.
-   This information will be accessible from the identity and included in the token on login.
-   Don't use reserved claim names as "iss", "aud", "exp", "nbf", "iat", "jti" and
-   the user_id_claim (default: "sub", see below). This claims will be silently ignored.
-   The default is None.
 
 master_secret
    A secret known only by the server, used for the default HMAC (HS*) algorithm.
