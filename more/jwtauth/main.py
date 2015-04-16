@@ -1,17 +1,18 @@
 from sys import version_info
 import datetime
 
-import morepath
 from morepath import (settings, Identity, NO_IDENTITY)
 
 import jwt
 
 
-class JwtApp(morepath.App):
-    pass
-
-
 """The following settings are available:
+
+    * extra_claims: A dictionary which contains extra information about the identity.
+                    This information will be accessible from the identity and included in the token on login.
+                    Don't use reserved claim names as "iss", "aud", "exp", "nbf", "iat", "jti" and
+                    the user_id_claim (default: "sub", see below). This claims will be silently ignored.
+                    The default is None.
 
     * master_secret:  A secret known only by the server, used for the default HMAC (HS*) algorithm.
 
@@ -57,6 +58,7 @@ class JWTIdentityPolicy(object):
     """
 
     def __init__(self,
+                 extra_claims=None,
                  master_secret=None,
                  private_key=None,
                  private_key_file=None,
@@ -71,6 +73,7 @@ class JWTIdentityPolicy(object):
                  userid_claim='sub'
                  ):
 
+            self.extra_claims = {} if extra_claims is None else extra_claims
             self.master_secret = master_secret
             self.private_key = private_key
             self.private_key_file = private_key_file
@@ -102,7 +105,7 @@ class JWTIdentityPolicy(object):
         userid = self.get_userid(claims_set)
         if userid is None:
             return NO_IDENTITY
-        extra_claims = self.get_extra_claims(claims_set)
+        extra_claims = self.check_extra_claims()
         if extra_claims is not None:
             return Identity(userid=userid, **extra_claims)
         else:
@@ -238,7 +241,7 @@ class JWTIdentityPolicy(object):
             return None
         return userid
 
-    def get_extra_claims(self, claims_set):
+    def check_extra_claims(self):
         """Get claims holding extra identity info from the claims set.
 
         Returns a dictionary of extra claims or None if there are none.
@@ -246,9 +249,9 @@ class JWTIdentityPolicy(object):
         userid_claim = self.userid_claim
         reserved_claims = (userid_claim, "iss", "aud", "exp", "nbf", "iat", "jti")
         extra_claims = {}
-        for claim in claims_set:
+        for claim in self.extra_claims:
             if claim not in reserved_claims:
-                extra_claims[claim] = claims_set[claim]
+                extra_claims[claim] = self.extra_claims[claim]
         if not extra_claims:
             return None
         return extra_claims

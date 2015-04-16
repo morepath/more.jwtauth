@@ -3,7 +3,7 @@ import datetime
 import morepath
 from morepath import (Response, settings, Identity, NO_IDENTITY)
 
-from more.jwtauth import JwtApp, JWTIdentityPolicy
+from more.jwtauth import JWTIdentityPolicy
 import more.jwtauth
 from webob.exc import HTTPForbidden, HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
@@ -17,7 +17,7 @@ def test_jwt_custom_settings():
     config = morepath.setup()
     config.scan(more.jwtauth)
 
-    class App(JwtApp):
+    class App(morepath.App):
         testing_config = config
 
     @App.setting_section(section="jwtauth")
@@ -133,7 +133,7 @@ def test_encode_decode_with_rs512():
     assert claims_set_decoded == claims_set
 
 
-def test_create_claim_and_encode_decode_and_get_userid_and_get_extra_claims():
+def test_create_claim_and_encode_decode_and_get_userid():
     config = morepath.setup()
     config.scan(more.jwtauth)
 
@@ -141,16 +141,11 @@ def test_create_claim_and_encode_decode_and_get_userid_and_get_extra_claims():
 
     config.commit()
     userid = 'user'
-    extra_claims = {
-        'email': 'user@example.com',
-        'role': 'admin'
-    }
-    claims_set = identity_policy.create_claims_set(userid, extra_claims)
+    claims_set = identity_policy.create_claims_set(userid)
     token = identity_policy.encode_jwt(claims_set)
     claims_set_decoded = identity_policy.decode_jwt(token)
 
     assert userid == identity_policy.get_userid(claims_set_decoded)
-    assert extra_claims == identity_policy.get_extra_claims(claims_set_decoded)
 
 
 def test_create_claim_and_encode_decode_expired():
@@ -194,7 +189,7 @@ def test_login():
     config = morepath.setup()
     config.scan(more.jwtauth)
 
-    class App(JwtApp):
+    class App(morepath.App):
         testing_config = config
 
     @App.setting_section(section="jwtauth")
@@ -268,7 +263,7 @@ def test_jwt_identity_policy():
     config = morepath.setup()
     config.scan(more.jwtauth)
 
-    class App(JwtApp):
+    class App(morepath.App):
         testing_config = config
 
     class Model(object):
@@ -331,11 +326,55 @@ def test_jwt_identity_policy():
     assert response.body == b'Model: foo'
 
 
+def test_jwt_identity_policy_with_extra_claims():
+    config = morepath.setup()
+    config.scan(more.jwtauth)
+
+    class App(morepath.App):
+        testing_config = config
+
+    class Model(object):
+        pass
+
+    @App.path(model=Model, path='test')
+    def get_model():
+        return Model()
+
+    @App.view(model=Model)
+    def default(self, request):
+        return "Your email: %s" % request.identity.email
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'master_secret': 'secret',
+            'extra_claims': {'email': 'user@example.com'}
+        }
+
+    @App.identity_policy()
+    def get_identity_policy(settings):
+        jwtauth_settings = settings.jwtauth.__dict__.copy()
+        return JWTIdentityPolicy(**jwtauth_settings)
+
+    @App.verify_identity()
+    def verify_identity(identity):
+        return True
+
+    config.commit()
+
+    c = Client(App())
+
+    headers = {'Authorization': 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.'
+                                '8jVjALlPRYpE03sMD8kuqG9D4RSih5NjiISNZ-wO3oY'}
+    response = c.get('/test', headers=headers)
+    assert response.body == b'Your email: user@example.com'
+
+
 def test_jwt_remember():
     config = morepath.setup()
     config.scan(more.jwtauth)
 
-    class App(JwtApp):
+    class App(morepath.App):
         testing_config = config
 
     @App.path(path='{id}',
@@ -376,7 +415,7 @@ def test_jwt_forget():
     config = morepath.setup()
     config.scan(more.jwtauth)
 
-    class App(JwtApp):
+    class App(morepath.App):
         testing_config = config
 
     @App.path(path='{id}')

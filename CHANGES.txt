@@ -1,19 +1,20 @@
 CHANGES
 *******
 
-0.2.dev0 (unreleased)
+0.2 (unreleased)
 =====================
 
-- Integrate the set_jwt_auth_header function into the identity policy as remember method.
+- Integrate the set_jwt_auth_header function into the identity policy as remember method
+  and add the extra claims to settings.
 
 - Add support for PS256, PS384, and PS512 algorithms.
 
 - Pass settings directly as arguments to the JWTIdentityPolicy class with the possibility
   to override them with Morepath settings using the method introduced in Morepath 0.11.
 
-- It's now possible to use JWTIdentityPolicy directly without inherit from JwtApp.
+- Remove JwtApp as now we use JWTIdentityPolicy directly without inherit from JwtApp.
 
-- Add a Introduction and Usage section to README. (TODO)
+- Add a Introduction and Usage section to README.
 
 - Integrate all functions as methods in the JWTIdentityPolicy Class.
 

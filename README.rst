@@ -1,5 +1,5 @@
-more.jwtauth: JWT-Auth integration for Morepath
-===============================================
+more.jwtauth: JWT Authentication integration for Morepath
+=========================================================
 
 
 Overview
@@ -15,14 +15,77 @@ For more information about JWT, see:
 To access resources using JWT Access Authentication, the client must have obtained a JWT to make signed requests to the server.
 The Token can be opaque to client, although, unless it is encrypted, the client can read the claims made in the token.
 
+JWT validates the authenticity of the claimset using the signature.
+
 This plugin uses the `PyJWT library`_ from José Padilla for verifying JWTs.
+
+Indroduction
+------------
+
+The general workflow of JWT Access Authentication:
+
+After the client has sent the login form we check if the user exists and if the password is valid.
+In this case more.jwtauth generates a JWT token including all information in a claim set and send
+it back to the client included in the HTTP authentication header. The client stores it in some local
+storage and send it back in the authentication header on every request. more.jwtauth validates the
+authenticity of the claim set using the signature included in the token. The logout should be handled
+by the client by removing the token and making some cleanup depending on the implementation.
+
+You can include all necessary information about the identity in the token so JWT Access Authentication
+can be used by a stateless service e.g. with external password validation.
+
 
 
 Usage
 -----
 
+For a basic setup just set the necessary settings including a key or key file
+and pass them to JWTIdentityPolicy::
+
+    import morepath
+    from more.jwtauth import JWTIdentityPolicy
 
 
+    class App(morepath.App):
+        pass
+
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            # set a key or key file
+            'master_secret': 'secret',
+            # adjust the settings, which you need
+            'leeway': 10,
+            # you can add some extra information about the identity
+            'extra_claims': {
+                'fullname': 'Harry Potter',
+                'email': 'harry@potter.com',
+                'role': 'wizard'
+            }
+        }
+
+
+    @App.identity_policy()
+    def get_identity_policy(settings):
+        jwtauth_settings = settings.jwtauth.__dict__.copy()
+        return JWTIdentityPolicy(**jwtauth_settings)
+
+
+    @App.verify_identity()
+    def verify_identity(identity):
+        # As we use a token based authentication we can trust the claimed identity.
+        return True
+
+The login we can do in a standard Morepath way but the logout should be handled by the client.
+
+Advanced: For testing or if we want to use some methods of the JWTIdentityPolicy class directly we can
+          pass the settings as arguments to the class::
+
+    identity_policy = JWTIdentityPolicy(
+        master_secret='secret',
+        leeway = 10
+    )
 
 Requirements
 ------------
@@ -80,9 +143,10 @@ Settings
 
 There are some settings that you can override. Here are all the defaults::
 
-    @JwtApp.setting_section(section="jwtauth")
+    @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
         return {
+            'extra_claims': None,
             'master_secret': None,
             'private_key': None,
             'private_key_file': None,
@@ -98,6 +162,13 @@ There are some settings that you can override. Here are all the defaults::
         }
 
 The following settings are available:
+
+extra_claims
+   A dictionary which contains extra information about the identity.
+   This information will be accessible from the identity and included in the token on login.
+   Don't use reserved claim names as "iss", "aud", "exp", "nbf", "iat", "jti" and
+   the user_id_claim (default: "sub", see below). This claims will be silently ignored.
+   The default is None.
 
 master_secret
    A secret known only by the server, used for the default HMAC (HS*) algorithm.
