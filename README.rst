@@ -52,17 +52,20 @@ and pass them to JWTIdentityPolicy::
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
         return {
-            # set a key or key file
+            # Set a key or key file.
             'master_secret': 'secret',
 
-            # adjust the settings, which you need
+            # Adjust the settings which you need.
             'leeway': 10
         }
 
 
     @App.identity_policy()
     def get_identity_policy(settings):
+        # Get the jwtauth settings as a dictionary.
         jwtauth_settings = settings.jwtauth.__dict__.copy()
+
+        # Pass the settings dictionary to the identity policy.
         return JWTIdentityPolicy(**jwtauth_settings)
 
 
@@ -93,7 +96,7 @@ which will be stored in the JWT token and can be accessed through the morepath.I
         email = request.POST['email']
         role = request.POST['role']
 
-        # Do some password validation.
+        # Do the password validation.
         if not user_has_password(username, password):
             raise HTTPProxyAuthenticationRequired('Invalid username/password')
 
