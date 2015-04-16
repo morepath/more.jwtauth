@@ -23,13 +23,12 @@ Indroduction
 ------------
 
 The general workflow of JWT Access Authentication:
-
-After the client has sent the login form we check if the user exists and if the password is valid.
-In this case more.jwtauth generates a JWT token including all information in a claim set and send
-it back to the client included in the HTTP authentication header. The client stores it in some local
-storage and send it back in the authentication header on every request. more.jwtauth validates the
-authenticity of the claim set using the signature included in the token. The logout should be handled
-by the client by removing the token and making some cleanup depending on the implementation.
+    After the client has sent the login form we check if the user exists and if the password is valid.
+    In this case more.jwtauth generates a JWT token including all information in a claim set and send
+    it back to the client included in the HTTP authentication header. The client stores it in some local
+    storage and send it back in the authentication header on every request. more.jwtauth validates the
+    authenticity of the claim set using the signature included in the token. The logout should be handled
+    by the client by removing the token and making some cleanup depending on the implementation.
 
 You can include all necessary information about the identity in the token so JWT Access Authentication
 can be used by a stateless service e.g. with external password validation.
