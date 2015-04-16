@@ -114,7 +114,7 @@ Advanced:
 
         identity_policy = JWTIdentityPolicy(
             master_secret='secret',
-            leeway = 10
+            leeway=10
         )
 
 Requirements
