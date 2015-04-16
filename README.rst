@@ -111,13 +111,14 @@ which will be stored in the JWT token and can be accessed through the morepath.I
 Don't use reserved claim names as "iss", "aud", "exp", "nbf", "iat", "jti" and
 the user_id_claim (default: "sub", see settings). They will be silently ignored.
 
-Advanced: For testing or if we want to use some methods of the JWTIdentityPolicy class directly we can
-          pass the settings as arguments to the class::
+Advanced:
+    For testing or if we want to use some methods of the JWTIdentityPolicy class
+    directly we can pass the settings as arguments to the class::
 
-    identity_policy = JWTIdentityPolicy(
-        master_secret='secret',
-        leeway = 10
-    )
+        identity_policy = JWTIdentityPolicy(
+            master_secret='secret',
+            leeway = 10
+        )
 
 Requirements
 ------------
