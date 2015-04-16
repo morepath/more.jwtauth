@@ -19,7 +19,7 @@ JWT validates the authenticity of the claimset using the signature.
 
 This plugin uses the `PyJWT library`_ from José Padilla for verifying JWTs.
 
-Indroduction
+Introduction
 ------------
 
 The general workflow of JWT Access Authentication:
@@ -68,7 +68,6 @@ and pass them to JWTIdentityPolicy::
 
     @App.verify_identity()
     def verify_identity(identity):
-
         # As we use a token based authentication we can trust the claimed identity.
         return True
 
@@ -100,7 +99,6 @@ which will be stored in the JWT token and can be accessed through the morepath.I
 
         @request.after
         def remember(response):
-
             # We pass the extra info to the identity object.
             identity = morepath.Identity(username, fullname=fullname, email=email, role=role)
             morepath.remember_identity(response, request, identity)
