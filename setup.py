@@ -7,7 +7,7 @@ long_description = (
     io.open('CHANGES.txt', encoding='utf-8').read())
 
 setup(name='more.jwtauth',
-      version='0.1',
+      version='0.2.dev0',
       description="JWT Access Auth Identity Policy for Morepath",
       long_description=long_description,
       author="Henri Schumacher",
@@ -21,12 +21,12 @@ setup(name='more.jwtauth',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'morepath > 0.9',
-          'PyJWT >= 1.0.0',
-          'cryptography >= 0.8'
+          'morepath > 0.10',
+          'PyJWT >= 1.1.0',
+          'cryptography >= 0.8.2'
       ],
       extras_require=dict(
-          test=['pytest >= 2.6.0',
+          test=['pytest >= 2.7.0',
                 'pytest-cov',
                 'WebTest'],
       ),

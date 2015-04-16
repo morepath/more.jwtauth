@@ -18,6 +18,12 @@ The Token can be opaque to client, although, unless it is encrypted, the client 
 This plugin uses the `PyJWT library`_ from José Padilla for verifying JWTs.
 
 
+Usage
+-----
+
+
+
+
 Requirements
 ------------
 
@@ -51,6 +57,15 @@ ES384
 ES512
    ECDSA signature algorithm using SHA-512 hash algorithm
 
+PS256
+   RSASSA-PSS signature using SHA-256 and MGF1 padding with SHA-256
+
+PS384
+   RSASSA-PSS signature using SHA-384 and MGF1 padding with SHA-384
+
+PS512
+   RSASSA-PSS signature using SHA-512 and MGF1 padding with SHA-512
+
 RS256
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-256 hash algorithm
 
@@ -59,7 +74,6 @@ RS384
 
 RS512
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
-
 
 Settings
 --------
@@ -90,19 +104,19 @@ master_secret
    Default is None.
 
 private_key
-   An RSA or an Elliptic Curve private_key used for the RSA (RS*) or EC (EC*) algorithms.
+   An Elliptic Curve or an RSA private_key used for the EC (EC*) or RSA (PS*/RS*) algorithms.
    Default is None.
 
 private_key_file
-   A file holding an RSA encoded (PEM/DER) or an Elliptic Curve private_key.
+   A file holding an Elliptic Curve or an RSA encoded (PEM/DER) private_key.
    Default is None.
 
 public_key
-   An RSA or an Elliptic Curve public_key used for the RSA (RS*) or EC (EC*) algorithms.
+   An Elliptic Curve or an RSA public_key used for the EC (EC*) or RSA (PS*/RS*) algorithms.
    Default is None.
 
 public_key_file
-   A file holding an RSA encoded (PEM/DER) or an Elliptic Curve public_key.
+   A file holding an Elliptic Curve or an RSA encoded (PEM/DER) public_key.
    Default is None.
 
 algorithm
@@ -137,7 +151,7 @@ userid_claim
    The default claim is 'sub'.
 
 The library takes either a master_secret or private_key/public_key pair.
-In the later case the algorithm must be an RS* or EC* version.
+In the later case the algorithm must be an EC*, PS* or RS* version.
 
 
 Inspiration
