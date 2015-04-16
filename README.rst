@@ -106,7 +106,7 @@ which will be stored in the JWT token and can be accessed through the morepath.I
         return "You're logged in."  # or something more fancy
 
 Don't use reserved claim names as "iss", "aud", "exp", "nbf", "iat", "jti" and
-the user_id_claim (default: "sub", see settings). They will be silently ignored.
+the user_id_claim (default: "sub", see settings_). They will be silently ignored.
 
 Advanced:
     For testing or if we want to use some methods of the JWTIdentityPolicy class
