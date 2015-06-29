@@ -1,6 +1,13 @@
 CHANGES
 *******
 
+0.3.dev0 (unreleased)
+=====================
+
+- Upgrade PyJWT to 1.3.0 and cryptography to 0.9.1.
+- Python 3.2 is no longer a supported platform. This version of Python is rarely used.
+  PyUsers affected by this should upgrade to 3.3+.
+
 0.2 (2015-06-29)
 =====================
 
@@ -18,6 +25,7 @@ CHANGES
 - Integrate all functions as methods in the JWTIdentityPolicy Class.
 
 - Refactor the test suite.
+
 
 0.1 (2015-04-15)
 ================

@@ -124,10 +124,10 @@ Advanced:
 Requirements
 ------------
 
--  Python (2.7, 3.2, 3.3, 3.4)
--  morepath
--  PyJWT
--  cryptography (be sure to install all dependencies as referenced in https://cryptography.io/en/latest/installation)
+-  Python (2.7, 3.3, 3.4)
+-  morepath (>= 0.11.1)
+-  PyJWT (1.3.0)
+-  cryptography (0.9.1 - be sure to install all dependencies as referenced in https://cryptography.io/en/latest/installation)
 
 
 Algorithms
