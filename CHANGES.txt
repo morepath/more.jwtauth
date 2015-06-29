@@ -1,7 +1,7 @@
 CHANGES
 *******
 
-0.2 (unreleased)
+0.2 (2015-06-29)
 =====================
 
 - Integrate the set_jwt_auth_header function into the identity policy as remember method.
