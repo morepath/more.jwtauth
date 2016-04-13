@@ -21,7 +21,6 @@ setup(name='more.jwtauth',
       classifiers=[
           "Development Status :: 4 - Beta",
           "Environment :: Web Environment",
-          "Framework :: Morepath",
           "Intended Audience :: Developers",
           "License :: OSI Approved :: BSD License",
           "Operating System :: OS Independent",
