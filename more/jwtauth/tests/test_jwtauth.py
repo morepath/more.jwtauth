@@ -14,11 +14,10 @@ def setup_module(module):
 
 
 def test_jwt_custom_settings():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
+    morepath.scan(more.jwtauth)
 
     class App(morepath.App):
-        testing_config = config
+        pass
 
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
@@ -30,8 +29,8 @@ def test_jwt_custom_settings():
             'leeway': 20
         }
 
-    config.commit()
-    lookup = App().registry.lookup
+    morepath.commit(App)
+    lookup = App().lookup
 
     assert settings(lookup=lookup).jwtauth.algorithm == "ES256"
     assert settings(lookup=lookup).jwtauth.leeway == 20
@@ -42,12 +41,7 @@ def test_jwt_custom_settings():
 
 
 def test_encode_decode():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
-
     identity_policy = JWTIdentityPolicy(master_secret='secret')
-
-    config.commit()
     claims_set = {
         'sub': 'user'
     }
@@ -58,12 +52,7 @@ def test_encode_decode():
 
 
 def test_encode_decode_with_unicode():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
-
     identity_policy = JWTIdentityPolicy(master_secret='sëcret')
-
-    config.commit()
     claims_set = {
         'sub': 'user'
     }
@@ -74,16 +63,11 @@ def test_encode_decode_with_unicode():
 
 
 def test_encode_decode_with_es256():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
-
     identity_policy = JWTIdentityPolicy(
         algorithm='ES256',
         private_key_file='more/jwtauth/tests/keys/testkey_ec',
         public_key_file='more/jwtauth/tests/keys/testkey_ec.pub'
     )
-
-    config.commit()
     claims_set = {
         'sub': 'user'
     }
@@ -94,16 +78,11 @@ def test_encode_decode_with_es256():
 
 
 def test_encode_decode_with_ps384():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
-
     identity_policy = JWTIdentityPolicy(
         algorithm='PS384',
         private_key_file='more/jwtauth/tests/keys/testkey_rsa',
         public_key_file='more/jwtauth/tests/keys/testkey_rsa.pub'
     )
-
-    config.commit()
     claims_set = {
         'sub': 'user'
     }
@@ -114,16 +93,11 @@ def test_encode_decode_with_ps384():
 
 
 def test_encode_decode_with_rs512():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
-
     identity_policy = JWTIdentityPolicy(
         algorithm='RS512',
         private_key_file='more/jwtauth/tests/keys/testkey_rsa',
         public_key_file='more/jwtauth/tests/keys/testkey_rsa.pub'
     )
-
-    config.commit()
     claims_set = {
         'sub': 'user'
     }
@@ -134,12 +108,7 @@ def test_encode_decode_with_rs512():
 
 
 def test_create_claim_and_encode_decode_and_get_userid_and_get_extra_claims():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
-
     identity_policy = JWTIdentityPolicy(master_secret='secret')
-
-    config.commit()
     userid = 'user'
     extra_claims = {
         'email': 'user@example.com',
@@ -154,15 +123,10 @@ def test_create_claim_and_encode_decode_and_get_userid_and_get_extra_claims():
 
 
 def test_create_claim_and_encode_decode_expired():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
-
     identity_policy = JWTIdentityPolicy(
         master_secret='secret',
         expiration_delta=datetime.timedelta(seconds=-2)
     )
-
-    config.commit()
     userid = 'user'
     claims_set = identity_policy.create_claims_set(userid)
     token = identity_policy.encode_jwt(claims_set)
@@ -172,16 +136,11 @@ def test_create_claim_and_encode_decode_expired():
 
 
 def test_create_claim_and_encode_decode_expired_but_with_leeway():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
-
     identity_policy = JWTIdentityPolicy(
         master_secret='secret',
         expiration_delta=datetime.timedelta(seconds=-2),
         leeway=3
     )
-
-    config.commit()
     userid = 'user'
     claims_set = identity_policy.create_claims_set(userid)
     token = identity_policy.encode_jwt(claims_set)
@@ -191,11 +150,10 @@ def test_create_claim_and_encode_decode_expired_but_with_leeway():
 
 
 def test_login():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
+    morepath.scan(more.jwtauth)
 
     class App(morepath.App):
-        testing_config = config
+        pass
 
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
@@ -236,7 +194,7 @@ def test_login():
     def user_has_password(username, password):
         return username == 'user' and password == 'password'
 
-    config.commit()
+    morepath.commit(App)
     c = Client(App())
     r = c.post('/login', 'username=user&password=false', status=407)
     r = c.post('/login', 'username=not_exists&password=password', status=407)
@@ -264,11 +222,10 @@ def test_login():
 
 
 def test_login_with_extra_claims():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
+    morepath.scan(more.jwtauth)
 
     class App(morepath.App):
-        testing_config = config
+        pass
 
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
@@ -315,7 +272,7 @@ def test_login_with_extra_claims():
     def user_has_password(username, password):
         return username == 'user' and password == 'password'
 
-    config.commit()
+    morepath.commit(App)
     c = Client(App())
     params = {
         'username': 'user',
@@ -351,11 +308,10 @@ def test_login_with_extra_claims():
 
 
 def test_jwt_identity_policy():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
+    morepath.scan(more.jwtauth)
 
     class App(morepath.App):
-        testing_config = config
+        pass
 
     class Model(object):
         def __init__(self, id):
@@ -401,7 +357,7 @@ def test_jwt_identity_policy():
 
         return "Unauthorized"
 
-    config.commit()
+    morepath.commit(App)
 
     c = Client(App())
 
@@ -418,11 +374,10 @@ def test_jwt_identity_policy():
 
 
 def test_jwt_remember():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
+    morepath.scan(more.jwtauth)
 
     class App(morepath.App):
-        testing_config = config
+        pass
 
     @App.path(path='{id}',
               variables=lambda model: {'id': model.id})
@@ -448,7 +403,7 @@ def test_jwt_remember():
         jwtauth_settings = settings.jwtauth.__dict__.copy()
         return JWTIdentityPolicy(**jwtauth_settings)
 
-    config.commit()
+    morepath.commit(App)
 
     c = Client(App())
 
@@ -459,11 +414,10 @@ def test_jwt_remember():
 
 
 def test_jwt_forget():
-    config = morepath.setup()
-    config.scan(more.jwtauth)
+    morepath.scan(more.jwtauth)
 
     class App(morepath.App):
-        testing_config = config
+        pass
 
     @App.path(path='{id}')
     class Model(object):
@@ -482,7 +436,7 @@ def test_jwt_forget():
     def get_identity_policy():
         return JWTIdentityPolicy()
 
-    config.commit()
+    morepath.commit(App)
 
     c = Client(App())
 
