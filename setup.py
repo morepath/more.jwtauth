@@ -6,7 +6,7 @@ long_description = (
     io.open('CHANGES.rst', encoding='utf-8').read())
 
 setup(name='more.jwtauth',
-      version='0.4.dev0',
+      version='0.4',
       description="JWT Access Auth Identity Policy for Morepath",
       long_description=long_description,
       author="Henri Schumacher",

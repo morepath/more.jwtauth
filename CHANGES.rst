@@ -1,8 +1,8 @@
 CHANGES
 *******
 
-0.4.dev0 (unreleased)
-=====================
+0.4 (2016-04-13)
+================
 
 - Upgrade to morepath 0.13.2 and update the tests.
 - Upgrade PyJWT to 1.3.0 and cryptography to 1.3.1.
