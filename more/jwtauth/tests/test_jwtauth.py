@@ -209,7 +209,6 @@ def test_login():
         jwtauth_settings = settings.jwtauth.__dict__.copy()
         return JWTIdentityPolicy(**jwtauth_settings)
 
-
     class Login(object):
         pass
 
@@ -281,7 +280,6 @@ def test_login_with_extra_claims():
     def get_identity_policy(settings):
         jwtauth_settings = settings.jwtauth.__dict__.copy()
         return JWTIdentityPolicy(**jwtauth_settings)
-
 
     class Login(object):
         pass

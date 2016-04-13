@@ -1,12 +1,6 @@
-from sys import version_info
-import datetime
+"""Provides the JWTIdentityPolicy.
 
-from morepath import (settings, Identity, NO_IDENTITY)
-
-import jwt
-
-
-"""The following settings are available:
+The following settings are available:
 
     * master_secret:  A secret known only by the server, used for the default HMAC (HS*) algorithm.
 
@@ -42,6 +36,14 @@ In the later case the algorithm must be an EC*, PS* or RS* version.
 """
 
 
+from sys import version_info
+import datetime
+
+from morepath import (Identity, NO_IDENTITY)
+
+import jwt
+
+
 class JWTIdentityPolicy(object):
     """Morepath Identity Policy implementing JWT Access Auth.
 
@@ -65,7 +67,7 @@ class JWTIdentityPolicy(object):
                  auth_header_prefix='JWT',
                  userid_claim='sub'
                  ):
-
+            """Initiate the JWTIdentityPolicy with the given settings."""
             self.master_secret = master_secret
             self.private_key = private_key
             self.private_key_file = private_key_file
@@ -117,9 +119,7 @@ class JWTIdentityPolicy(object):
         :type request: :class:`morepath.Request`
         :param identity: identity to remember.
         :type identity: :class:`morepath.security.Identity`
-
         """
-
         extra_claims = identity.as_dict()
         userid = extra_claims.pop('userid')
         claims_set = self.create_claims_set(userid, extra_claims)
@@ -139,7 +139,6 @@ class JWTIdentityPolicy(object):
         :type response: :class:`morepath.Response`
         :param request: request object.
         :type request: :class:`morepath.Request`
-
         """
         pass
 
@@ -153,7 +152,9 @@ class JWTIdentityPolicy(object):
         If private_key/public key is set then the public_key will be used to
         decode the key.
         The leeway, issuer and verify_expiration settings will be passed to jwt.decode.
-        """
+
+        :param token: the JWTAuth token.
+       """
         key = self.master_secret
         public_key = self.public_key
         if self.public_key_file is not None:
@@ -190,6 +191,9 @@ class JWTIdentityPolicy(object):
         With the extra_claims dictionary you can provide additional claims. This can be registered claims like "nbf"
         (the datetime before which the token should not be processed) and/or claims containing extra info
         about the identity, which will be stored in the Identity object.
+
+        :param userid:  the userid of the claimed identity.
+        :param extra_claims: dictionary, containing additional claims or None.
         """
         expiration_delta = self.expiration_delta
         issuer = self.issuer
@@ -210,6 +214,8 @@ class JWTIdentityPolicy(object):
         In this case the algorithm must be an RS* or EC* algorithm.
         If registry.settings.jwtauth.private_key is not set, registry.settings.jwtauth.master_secret is used.
         registry.settings.jwtauth.algorithm is used as algorithm.
+
+        :param claims_set: set of claims, which will be included in the created token.
         """
         key = self.master_secret
         private_key = self.private_key
@@ -228,6 +234,8 @@ class JWTIdentityPolicy(object):
         """Extract the userid from a claims set.
 
         Returns userid or None if there is none.
+
+        :param claims_set: set of claims, which was included in the received token.
         """
         userid_claim = self.userid_claim
         if userid_claim in claims_set:
@@ -240,6 +248,8 @@ class JWTIdentityPolicy(object):
         """Get claims holding extra identity info from the claims set.
 
         Returns a dictionary of extra claims or None if there are none.
+
+        :param claims_set: set of claims, which was included in the received token.
         """
         userid_claim = self.userid_claim
         reserved_claims = (userid_claim, "iss", "aud", "exp", "nbf", "iat", "jti")
@@ -254,7 +264,10 @@ class JWTIdentityPolicy(object):
     def get_jwt(self, request):
         """Extract the JWT token from the authorisation header of the request.
 
-         Returns the JWT token or None, if the token cannot be extracted.
+        Returns the JWT token or None, if the token cannot be extracted.
+
+        :param request: request object.
+        :type request: :class:`morepath.Request`
         """
         auth_header_prefix = self.auth_header_prefix
         try:
