@@ -154,7 +154,7 @@ class JWTIdentityPolicy(object):
         The leeway, issuer and verify_expiration settings will be passed to jwt.decode.
 
         :param token: the JWTAuth token.
-       """
+        """
         key = self.master_secret
         public_key = self.public_key
         if self.public_key_file is not None:

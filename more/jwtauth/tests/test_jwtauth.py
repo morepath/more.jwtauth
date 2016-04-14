@@ -3,8 +3,8 @@ import datetime
 import morepath
 from morepath import (Response, settings, Identity, NO_IDENTITY)
 
-from more.jwtauth import JWTIdentityPolicy
 import more.jwtauth
+from more.jwtauth import JWTIdentityPolicy
 from webob.exc import HTTPForbidden, HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
 
@@ -30,7 +30,9 @@ def test_jwt_custom_settings():
         }
 
     morepath.commit(App)
-    lookup = App().lookup
+
+    app = App()
+    lookup = app.lookup
 
     assert settings(lookup=lookup).jwtauth.algorithm == "ES256"
     assert settings(lookup=lookup).jwtauth.leeway == 20
