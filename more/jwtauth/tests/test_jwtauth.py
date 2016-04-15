@@ -3,10 +3,11 @@ import datetime
 import morepath
 from morepath import (Response, settings, Identity, NO_IDENTITY)
 
-import more.jwtauth
 from more.jwtauth import JWTIdentityPolicy
 from webob.exc import HTTPForbidden, HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
+from jwt import InvalidIssuerError
+import pytest
 
 
 def setup_module(module):
@@ -14,8 +15,6 @@ def setup_module(module):
 
 
 def test_jwt_custom_settings():
-    morepath.scan(more.jwtauth)
-
     class App(morepath.App):
         pass
 
@@ -62,6 +61,32 @@ def test_encode_decode_with_unicode():
     claims_set_decoded = identity_policy.decode_jwt(token)
 
     assert claims_set_decoded == claims_set
+
+
+def test_encode_decode_with_issuer():
+    identity_policy = JWTIdentityPolicy(master_secret='secret', issuer='Issuer_App')
+    userid = 'user'
+    extra_claims = {
+        'iss': 'Issuer_App'
+    }
+    claims_set = identity_policy.create_claims_set(userid, extra_claims)
+    token = identity_policy.encode_jwt(claims_set)
+    claims_set_decoded = identity_policy.decode_jwt(token)
+
+    assert claims_set_decoded == claims_set
+
+
+def test_encode_decode_with_invalid_issuer():
+    identity_policy = JWTIdentityPolicy(master_secret='secret', issuer='Issuer_App')
+    userid = 'user'
+    extra_claims = {
+        'iss': 'Invalid_Issuer_App'
+    }
+    claims_set = identity_policy.create_claims_set(userid, extra_claims)
+    token = identity_policy.encode_jwt(claims_set)
+
+    with pytest.raises(InvalidIssuerError):
+        claims_set_decoded = identity_policy.decode_jwt(token)
 
 
 def test_encode_decode_with_es256():
@@ -124,6 +149,15 @@ def test_create_claim_and_encode_decode_and_get_userid_and_get_extra_claims():
     assert extra_claims == identity_policy.get_extra_claims(claims_set_decoded)
 
 
+def test_get_userid_without_userid():
+    identity_policy = JWTIdentityPolicy(master_secret='secret')
+    claims_set = {}
+    token = identity_policy.encode_jwt(claims_set)
+    claims_set_decoded = identity_policy.decode_jwt(token)
+
+    assert identity_policy.get_userid(claims_set_decoded) is None
+
+
 def test_create_claim_and_encode_decode_expired():
     identity_policy = JWTIdentityPolicy(
         master_secret='secret',
@@ -152,8 +186,6 @@ def test_create_claim_and_encode_decode_expired_but_with_leeway():
 
 
 def test_login():
-    morepath.scan(more.jwtauth)
-
     class App(morepath.App):
         pass
 
@@ -185,7 +217,7 @@ def test_login():
 
         @request.after
         def remember(response):
-            identity = morepath.Identity(username)
+            identity = Identity(username)
             morepath.remember_identity(response, request, identity,
                                        lookup=request.lookup)
 
@@ -224,8 +256,6 @@ def test_login():
 
 
 def test_login_with_extra_claims():
-    morepath.scan(more.jwtauth)
-
     class App(morepath.App):
         pass
 
@@ -260,7 +290,7 @@ def test_login_with_extra_claims():
 
         @request.after
         def remember(response):
-            identity = morepath.Identity(username, fullname=fullname, email=email, role=role)
+            identity = Identity(username, fullname=fullname, email=email, role=role)
             morepath.remember_identity(response, request, identity,
                                        lookup=request.lookup)
 
@@ -276,6 +306,14 @@ def test_login_with_extra_claims():
 
     morepath.commit(App)
     c = Client(App())
+    params = {
+        'username': 'not_exist',
+        'password': 'password',
+        'fullname': 'Harry Potter',
+        'email': 'harry@potter.com',
+        'role': 'wizard'
+    }
+    r = c.post('/login', params, status=407)
     params = {
         'username': 'user',
         'password': 'password',
@@ -310,8 +348,6 @@ def test_login_with_extra_claims():
 
 
 def test_jwt_identity_policy():
-    morepath.scan(more.jwtauth)
-
     class App(morepath.App):
         pass
 
@@ -363,21 +399,116 @@ def test_jwt_identity_policy():
 
     c = Client(App())
 
+    identity_policy = JWTIdentityPolicy(
+        master_secret='secret'
+    )
+
     response = c.get('/foo', status=401)
 
-    headers = {'Authorization': 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ3cm9uZyJ9.'
-                                'mUHfZIsrGyUHconbskiKNIS6FkNrt3An-OwIbWBb-CA'}
+    claims_set = {
+        'sub': 'wrong_user'
+    }
+    token = identity_policy.encode_jwt(claims_set)
+    headers = {'Authorization': 'JWT ' + token}
     response = c.get('/foo', headers=headers, status=401)
 
-    headers = {'Authorization': 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.'
-                                '8jVjALlPRYpE03sMD8kuqG9D4RSih5NjiISNZ-wO3oY'}
+    claims_set = {
+        'sub': 'user'
+    }
+    token = identity_policy.encode_jwt(claims_set)
+    headers = {'Authorization': 'JWT ' + token}
+    response = c.get('/foo', headers=headers)
+    assert response.body == b'Model: foo'
+
+
+def test_jwt_identity_policy_errors_utf8_extra_claims():
+    class App(morepath.App):
+        pass
+
+    class Model(object):
+        def __init__(self, id):
+            self.id = id
+
+    class Permission(object):
+        pass
+
+    @App.path(model=Model, path='{id}',
+              variables=lambda model: {'id': model.id})
+    def get_model(id):
+        return Model(id)
+
+    @App.permission_rule(model=Model, permission=Permission)
+    def get_permission(identity, model, permission):
+        return identity.userid == 'user'
+
+    @App.view(model=Model, permission=Permission)
+    def default(self, request):
+        return "Model: %s" % self.id
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'master_secret': u'sëcret',
+        }
+
+    @App.identity_policy()
+    def get_identity_policy(settings):
+        jwtauth_settings = settings.jwtauth.__dict__.copy()
+        return JWTIdentityPolicy(**jwtauth_settings)
+
+    @App.verify_identity()
+    def verify_identity(identity):
+        assert identity is not NO_IDENTITY
+        return True
+
+    morepath.commit(App)
+
+    c = Client(App())
+
+    identity_policy = JWTIdentityPolicy(
+        master_secret=u'sëcret'
+    )
+
+    response = c.get('/foo', status=403)
+
+    headers = {'Authorization': 'Something'}
+    response = c.get('/foo', headers=headers, status=403)
+
+    headers = {'Authorization': 'Something other'}
+    response = c.get('/foo', headers=headers, status=403)
+
+    headers = {'Authorization': 'JWT ' + 'nonsense'}
+    response = c.get('/foo', headers=headers, status=403)
+
+    headers = {'Authorization': 'JWT ' + '1234567890'}
+    response = c.get('/foo', headers=headers, status=403)
+
+    claims_set = {
+        'sub': None
+    }
+    token = identity_policy.encode_jwt(claims_set)
+    headers = {'Authorization': 'JWT ' + token}
+    response = c.get('/foo', headers=headers, status=403)
+
+    claims_set = {
+        'sub': 'user'
+    }
+    token = identity_policy.encode_jwt(claims_set)
+    headers = {'Authorization': 'JWT ' + token}
+    response = c.get('/foo', headers=headers)
+    assert response.body == b'Model: foo'
+
+    claims_set = {
+        'sub': 'user',
+        'email': 'harry@potter.com'
+    }
+    token = identity_policy.encode_jwt(claims_set)
+    headers = {'Authorization': 'JWT ' + token}
     response = c.get('/foo', headers=headers)
     assert response.body == b'Model: foo'
 
 
 def test_jwt_remember():
-    morepath.scan(more.jwtauth)
-
     class App(morepath.App):
         pass
 
@@ -416,8 +547,6 @@ def test_jwt_remember():
 
 
 def test_jwt_forget():
-    morepath.scan(more.jwtauth)
-
     class App(morepath.App):
         pass
 

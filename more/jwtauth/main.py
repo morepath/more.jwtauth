@@ -36,12 +36,15 @@ In the later case the algorithm must be an EC*, PS* or RS* version.
 """
 
 
-from sys import version_info
 import datetime
 
 from morepath import (Identity, NO_IDENTITY)
 
 import jwt
+
+from sys import version_info
+
+PY3 = version_info[0] == 3
 
 
 class JWTIdentityPolicy(object):
@@ -162,10 +165,7 @@ class JWTIdentityPolicy(object):
                 public_key = rsa_pub_file.read()
         if public_key is not None:
             key = public_key
-        if self.leeway is not None:
-            leeway = self.leeway
-        else:
-            leeway = 0
+        leeway = self.leeway
         options = {
             'verify_exp': self.verify_expiration,
         }
@@ -226,8 +226,9 @@ class JWTIdentityPolicy(object):
             key = private_key
         algorithm = self.algorithm
         token = jwt.encode(claims_set, key, algorithm)
-        if version_info >= (3, 0, 0):
-            token = token.decode(encoding='UTF-8')
+
+        if PY3:
+            token = token.decode(encoding='UTF-8')  # pragma: nocoverage
         return token
 
     def get_userid(self, claims_set):

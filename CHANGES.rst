@@ -4,7 +4,9 @@ CHANGES
 0.5 (unreleased)
 ================
 
-- Nothing changed yet.
+- Adding some tests.
+- Increase coverage to 100%.
+- Some clean-up.
 
 
 0.4 (2016-04-13)
