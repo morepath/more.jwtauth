@@ -36,15 +36,13 @@ In the later case the algorithm must be an EC*, PS* or RS* version.
 """
 
 
+import sys
 import datetime
+import jwt
 
 from morepath import (Identity, NO_IDENTITY)
 
-import jwt
-
-from sys import version_info
-
-PY3 = version_info[0] == 3
+PY3 = sys.version_info[0] == 3
 
 
 class JWTIdentityPolicy(object):
