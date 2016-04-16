@@ -8,6 +8,9 @@ src
 doc/build
 .coverage
 htmlcov
+.cache
+build
+dist
 .tox
 *.pyc
 *.pyo

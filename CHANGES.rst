@@ -6,6 +6,7 @@ CHANGES
 
 - Adding some tests.
 - Increase coverage to 100%.
+- Add travis-ci and tox integration.
 - Some clean-up.
 
 
