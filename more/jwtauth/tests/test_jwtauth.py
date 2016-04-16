@@ -4,7 +4,7 @@ import morepath
 from morepath import (Response, settings, Identity, NO_IDENTITY)
 
 from more.jwtauth import JWTIdentityPolicy
-from webob.exc import HTTPForbidden, HTTPProxyAuthenticationRequired
+from webob.exc import HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
 from jwt import InvalidIssuerError
 import pytest
@@ -66,6 +66,16 @@ def test_encode_decode_with_unicode():
 def test_encode_decode_with_issuer():
     identity_policy = JWTIdentityPolicy(master_secret='secret', issuer='Issuer_App')
     userid = 'user'
+
+    extra_claims = {
+        'iss': 'Invalid_Issuer_App'
+    }
+    claims_set = identity_policy.create_claims_set(userid, extra_claims)
+    token = identity_policy.encode_jwt(claims_set)
+
+    with pytest.raises(InvalidIssuerError):
+        claims_set_decoded = identity_policy.decode_jwt(token)
+
     extra_claims = {
         'iss': 'Issuer_App'
     }
@@ -74,19 +84,6 @@ def test_encode_decode_with_issuer():
     claims_set_decoded = identity_policy.decode_jwt(token)
 
     assert claims_set_decoded == claims_set
-
-
-def test_encode_decode_with_invalid_issuer():
-    identity_policy = JWTIdentityPolicy(master_secret='secret', issuer='Issuer_App')
-    userid = 'user'
-    extra_claims = {
-        'iss': 'Invalid_Issuer_App'
-    }
-    claims_set = identity_policy.create_claims_set(userid, extra_claims)
-    token = identity_policy.encode_jwt(claims_set)
-
-    with pytest.raises(InvalidIssuerError):
-        claims_set_decoded = identity_policy.decode_jwt(token)  # noqa
 
 
 def test_encode_decode_with_es256():
@@ -387,14 +384,6 @@ def test_jwt_identity_policy():
         assert identity is not NO_IDENTITY
         return True
 
-    @App.view(model=HTTPForbidden)
-    def make_unauthorized(self, request):
-        @request.after
-        def set_status_code(response):
-            response.status_code = 401
-
-        return "Unauthorized"
-
     morepath.commit(App)
 
     c = Client(App())
@@ -403,14 +392,14 @@ def test_jwt_identity_policy():
         master_secret='secret'
     )
 
-    response = c.get('/foo', status=401)
+    response = c.get('/foo', status=403)
 
     claims_set = {
         'sub': 'wrong_user'
     }
     token = identity_policy.encode_jwt(claims_set)
     headers = {'Authorization': 'JWT ' + token}
-    response = c.get('/foo', headers=headers, status=401)
+    response = c.get('/foo', headers=headers, status=403)
 
     claims_set = {
         'sub': 'user'
@@ -474,15 +463,10 @@ def test_jwt_identity_policy_errors_utf8_extra_claims():
     headers = {'Authorization': 'Something'}
     response = c.get('/foo', headers=headers, status=403)
 
-    headers = {'Authorization': 'Something other'}
-    response = c.get('/foo', headers=headers, status=403)
-
     headers = {'Authorization': 'JWT ' + 'nonsense'}
     response = c.get('/foo', headers=headers, status=403)
 
-    headers = {'Authorization': 'JWT ' + '1234567890'}
-    response = c.get('/foo', headers=headers, status=403)
-
+    # no userid
     claims_set = {
         'sub': None
     }
@@ -498,6 +482,7 @@ def test_jwt_identity_policy_errors_utf8_extra_claims():
     response = c.get('/foo', headers=headers)
     assert response.body == b'Model: foo'
 
+    # extra claims
     claims_set = {
         'sub': 'user',
         'email': 'harry@potter.com'

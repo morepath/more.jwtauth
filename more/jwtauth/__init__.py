@@ -1,1 +1,3 @@
-from .main import JWTIdentityPolicy  # noqa
+# flake8: noqa
+
+from .main import JWTIdentityPolicy
