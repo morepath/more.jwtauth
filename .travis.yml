@@ -10,8 +10,5 @@ before_install:
     - pip install --upgrade pip setuptools
 install:
     - pip install tox
-    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
 script:
     - tox -e $TOXENV
-after_success:
-    - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
