@@ -16,7 +16,7 @@ The following settings are available:
                         Default is 6 hours, set to None to disable.
 
     * leeway:  The leeway, which allows you to validate an expiration time which is in the past,
-               but not very far. To use as a datetime.timedelta. Defaults is None.
+               but not very far. To use as a datetime.timedelta. Defaults is 0.
 
     * verify_expiration: Default is True. If you set it to False and expiration_delta is not None,
                          you should verify the "exp" claim by yourself and if it is expired you can either
@@ -226,7 +226,7 @@ class JWTIdentityPolicy(object):
         token = jwt.encode(claims_set, key, algorithm)
 
         if PY3:
-            token = token.decode(encoding='UTF-8')  # pragma: nocoverage
+            token = token.decode(encoding='UTF-8')
         return token
 
     def get_userid(self, claims_set):

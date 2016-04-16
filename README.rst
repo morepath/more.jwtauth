@@ -227,7 +227,7 @@ expiration_delta
 leeway
    The leeway, which allows you to validate an expiration time which is in the past, but not very far.
    To use as a datetime.timedelta.
-   Defaults is None.
+   Defaults is 0.
 
 verify_expiration
    If you set it to False and expiration_delta is not None, you should verify the "exp" claim by yourself
