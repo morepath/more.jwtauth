@@ -1,1 +1,1 @@
-from .main import JWTIdentityPolicy
+from .main import JWTIdentityPolicy  # noqa
