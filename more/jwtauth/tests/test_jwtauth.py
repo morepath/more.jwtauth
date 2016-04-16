@@ -36,8 +36,8 @@ def test_jwt_custom_settings():
     assert settings(lookup=lookup).jwtauth.algorithm == "ES256"
     assert settings(lookup=lookup).jwtauth.leeway == 20
     assert settings(
-        lookup=lookup).jwtauth.public_key == 'MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBWcJwPEAnS/k4kFgUhxNF7J0SQQhZG+nNgy+' \
-                                             '/mXwhQ5PZIUmId1a1TjkNXiKzv6DpttBqduHbz/V0EtH+QfWy0B4BhZ5MnTyDGjcz1DQqKd' \
+        lookup=lookup).jwtauth.public_key == 'MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBWcJwPEAnS/k4kFgUhxNF7J0SQQhZG+nNgy+'\
+                                             '/mXwhQ5PZIUmId1a1TjkNXiKzv6DpttBqduHbz/V0EtH+QfWy0B4BhZ5MnTyDGjcz1DQqKd'\
                                              'exebhzobbhSIZjpYd5aU48o9rXp/OnAnrajddpGsJ0bNf4rtMLBqFYJN6LOslAB7xTBRg='
 
 
