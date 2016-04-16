@@ -478,6 +478,10 @@ def test_jwt_identity_policy_errors_utf8_extra_claims():
         'sub': 'user'
     }
     token = identity_policy.encode_jwt(claims_set)
+
+    headers = {'Authorization': 'OtherAuthType ' + token}
+    response = c.get('/foo', headers=headers, status=403)
+
     headers = {'Authorization': 'JWT ' + token}
     response = c.get('/foo', headers=headers)
     assert response.body == b'Model: foo'
