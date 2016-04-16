@@ -86,7 +86,7 @@ def test_encode_decode_with_invalid_issuer():
     token = identity_policy.encode_jwt(claims_set)
 
     with pytest.raises(InvalidIssuerError):
-        claims_set_decoded = identity_policy.decode_jwt(token)
+        claims_set_decoded = identity_policy.decode_jwt(token)  # noqa
 
 
 def test_encode_decode_with_es256():
