@@ -389,7 +389,7 @@ def test_jwt_identity_policy():
     c = Client(App())
 
     identity_policy = JWTIdentityPolicy(
-        master_secret='secret'
+        master_secret='secret',
     )
 
     response = c.get('/foo', status=403)
@@ -409,8 +409,18 @@ def test_jwt_identity_policy():
     response = c.get('/foo', headers=headers)
     assert response.body == b'Model: foo'
 
+    # extra claims
+    claims_set = {
+        'sub': 'user',
+        'email': 'harry@potter.com',
+    }
+    token = identity_policy.encode_jwt(claims_set)
+    headers = {'Authorization': 'JWT ' + token}
+    response = c.get('/foo', headers=headers)
+    assert response.body == b'Model: foo'
 
-def test_jwt_identity_policy_errors_utf8_extra_claims():
+
+def test_jwt_identity_policy_errors():
     class App(morepath.App):
         pass
 
@@ -438,6 +448,7 @@ def test_jwt_identity_policy_errors_utf8_extra_claims():
     def get_jwtauth_settings():
         return {
             'master_secret': u'sëcret',
+            'leeway': None
         }
 
     @App.identity_policy()
@@ -482,16 +493,6 @@ def test_jwt_identity_policy_errors_utf8_extra_claims():
     headers = {'Authorization': 'OtherAuthType ' + token}
     response = c.get('/foo', headers=headers, status=403)
 
-    headers = {'Authorization': 'JWT ' + token}
-    response = c.get('/foo', headers=headers)
-    assert response.body == b'Model: foo'
-
-    # extra claims
-    claims_set = {
-        'sub': 'user',
-        'email': 'harry@potter.com'
-    }
-    token = identity_policy.encode_jwt(claims_set)
     headers = {'Authorization': 'JWT ' + token}
     response = c.get('/foo', headers=headers)
     assert response.body == b'Model: foo'

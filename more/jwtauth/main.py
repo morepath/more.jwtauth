@@ -163,7 +163,10 @@ class JWTIdentityPolicy(object):
                 public_key = rsa_pub_file.read()
         if public_key is not None:
             key = public_key
-        leeway = self.leeway
+        if self.leeway is not None:
+            leeway = self.leeway
+        else:
+            leeway = 0
         options = {
             'verify_exp': self.verify_expiration,
         }
