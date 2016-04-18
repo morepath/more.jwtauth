@@ -87,8 +87,8 @@ class JWTIdentityPolicy(object):
 
         :param request: Request to extract identity information from.
         :type request: :class:`morepath.Request`.
-        :returns: :class:`morepath.security.Identity` instance or
-          :attr:`morepath.security.NO_IDENTITY` if identity cannot
+        :returns: :class:`morepath.Identity` instance or
+          :attr:`morepath.NO_IDENTITY` if identity cannot
           be established.
         """
         token = self.get_jwt(request)
@@ -119,7 +119,7 @@ class JWTIdentityPolicy(object):
         :param request: request object.
         :type request: :class:`morepath.Request`
         :param identity: identity to remember.
-        :type identity: :class:`morepath.security.Identity`
+        :type identity: :class:`morepath.Identity`
         """
         extra_claims = identity.as_dict()
         userid = extra_claims.pop('userid')
