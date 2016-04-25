@@ -7,7 +7,7 @@ long_description = (
 
 setup(
     name='more.jwtauth',
-    version='0.5.dev0',
+    version='0.5',
     description="JWT Access Auth Identity Policy for Morepath",
     long_description=long_description,
     author="Henri Hulski",

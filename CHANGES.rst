@@ -1,7 +1,7 @@
 CHANGES
 *******
 
-0.5 (unreleased)
+0.5 (2016-04-25)
 ================
 
 - Adding some tests.
