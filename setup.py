@@ -39,7 +39,7 @@ setup(
     ],
     install_requires=[
         'setuptools',
-        'morepath >= 0.13.2',
+        'morepath >= 0.14',
         'PyJWT == 1.4.0',
         'cryptography == 1.3.1'
     ],

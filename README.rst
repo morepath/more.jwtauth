@@ -125,7 +125,7 @@ Requirements
 ------------
 
 -  Python (2.7, 3.3, 3.4, 3.5)
--  morepath (>= 0.13.2)
+-  morepath (>= 0.14)
 -  PyJWT (1.4.0)
 -  cryptography (1.3.1 - be sure to install all dependencies as referenced in https://cryptography.io/en/latest/installation)
 

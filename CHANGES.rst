@@ -8,6 +8,9 @@ CHANGES
 - Increase coverage to 100%.
 - Add travis-ci and tox integration.
 - Some clean-up.
+- Upgrade to Morepath 0.14.
+- Some improvements to the setup and release workflow.
+
 
 
 0.4 (2016-04-13)
