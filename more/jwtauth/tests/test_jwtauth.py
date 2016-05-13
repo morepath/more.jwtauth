@@ -14,6 +14,11 @@ def setup_module(module):
     morepath.disable_implicit()
 
 
+def relative(filepath):
+    import os
+    return os.path.join(os.path.dirname(__file__), filepath)
+
+
 def test_jwt_custom_settings():
     class App(morepath.App):
         pass
@@ -89,8 +94,8 @@ def test_encode_decode_with_issuer():
 def test_encode_decode_with_es256():
     identity_policy = JWTIdentityPolicy(
         algorithm='ES256',
-        private_key_file='more/jwtauth/tests/keys/testkey_ec',
-        public_key_file='more/jwtauth/tests/keys/testkey_ec.pub'
+        private_key_file=relative('keys/testkey_ec'),
+        public_key_file=relative('keys/testkey_ec.pub')
     )
     claims_set = {
         'sub': 'user'
@@ -104,8 +109,8 @@ def test_encode_decode_with_es256():
 def test_encode_decode_with_ps384():
     identity_policy = JWTIdentityPolicy(
         algorithm='PS384',
-        private_key_file='more/jwtauth/tests/keys/testkey_rsa',
-        public_key_file='more/jwtauth/tests/keys/testkey_rsa.pub'
+        private_key_file=relative('keys/testkey_rsa'),
+        public_key_file=relative('keys/testkey_rsa.pub')
     )
     claims_set = {
         'sub': 'user'
@@ -119,8 +124,8 @@ def test_encode_decode_with_ps384():
 def test_encode_decode_with_rs512():
     identity_policy = JWTIdentityPolicy(
         algorithm='RS512',
-        private_key_file='more/jwtauth/tests/keys/testkey_rsa',
-        public_key_file='more/jwtauth/tests/keys/testkey_rsa.pub'
+        private_key_file=relative('keys/testkey_rsa'),
+        public_key_file=relative('keys/testkey_rsa.pub')
     )
     claims_set = {
         'sub': 'user'
