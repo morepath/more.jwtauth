@@ -2,3 +2,5 @@ CREDITS
 =======
 
 * Henri Hulski (author)
+
+* Stefano Taschini
