@@ -41,9 +41,9 @@ setup(
         'setuptools',
         'morepath >= 0.14',
         'PyJWT == 1.4.0',
-        'cryptography == 1.3.1'
     ],
     extras_require=dict(
+        cryptography=['cryptography == 1.3.1'],
         test=['pytest >= 2.9.1',
               'pytest-cov',
               'WebTest'],

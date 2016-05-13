@@ -9,6 +9,12 @@ from webtest import TestApp as Client
 from jwt import InvalidIssuerError
 import pytest
 
+try:
+    from cryptography.hazmat.primitives.asymmetric import ec  # noqa
+    has_crypto = True
+except ImportError:
+    has_crypto = False
+
 
 def setup_module(module):
     morepath.disable_implicit()
@@ -91,6 +97,7 @@ def test_encode_decode_with_issuer():
     assert claims_set_decoded == claims_set
 
 
+@pytest.mark.skipif(not has_crypto, reason='Not supported without cryptography library')
 def test_encode_decode_with_es256():
     identity_policy = JWTIdentityPolicy(
         algorithm='ES256',
@@ -106,6 +113,7 @@ def test_encode_decode_with_es256():
     assert claims_set_decoded == claims_set
 
 
+@pytest.mark.skipif(not has_crypto, reason='Not supported without cryptography library')
 def test_encode_decode_with_ps384():
     identity_policy = JWTIdentityPolicy(
         algorithm='PS384',
@@ -121,6 +129,7 @@ def test_encode_decode_with_ps384():
     assert claims_set_decoded == claims_set
 
 
+@pytest.mark.skipif(not has_crypto, reason='Not supported without cryptography library')
 def test_encode_decode_with_rs512():
     identity_policy = JWTIdentityPolicy(
         algorithm='RS512',
