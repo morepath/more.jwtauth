@@ -196,8 +196,8 @@ RS512 [1]_
 
          pip install -U more.jwtauth[crypto]
 
-       See Installation for details. In case of problems be sure
-       to have read the note in the Requirements section.
+       See Installation_ for details. In case of problems be sure
+       to have read the note in the Requirements_ section.
 
 
 Settings
