@@ -2,10 +2,13 @@ language: python
 
 cache: pip
 env:
-    - TOXENV=py27
-    - TOXENV=py33
-    - TOXENV=py34
-    - TOXENV=pep8
+    - TOXENV=py27-crypto
+    - TOXENV=py33-crypto
+    - TOXENV=py34-crypto
+    - TOXENV=py27-nocrypto
+    - TOXENV=py33-nocrypto
+    - TOXENV=py34-nocrypto
+    - TOXENV=flake8
     - TOXENV=coverage
 before_install:
     - pip install --upgrade pip setuptools

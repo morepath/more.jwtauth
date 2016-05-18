@@ -1,5 +1,6 @@
 import io
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 long_description = (
     io.open('README.rst', encoding='utf-8').read() + '\n\n' +
@@ -41,9 +42,9 @@ setup(
         'setuptools',
         'morepath >= 0.14',
         'PyJWT == 1.4.0',
-        'cryptography == 1.3.1'
     ],
     extras_require=dict(
+        crypto=['cryptography == 1.3.1'],
         test=['pytest >= 2.9.1',
               'pytest-cov',
               'WebTest'],

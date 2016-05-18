@@ -35,6 +35,33 @@ You can include all necessary information about the identity in the token so JWT
 can be used by a stateless service e.g. with external password validation.
 
 
+Requirements
+------------
+
+-  Python (2.7, 3.3, 3.4, 3.5)
+-  morepath (>= 0.14)
+-  PyJWT (1.4.0)
+-  optional: cryptography (1.3.1)
+
+.. Note::
+   If you want to use another algorithm than HMAC (HS*), you need to install
+   cryptography.
+   On some systems this can be a little tricky. Please follow the instructions
+   in https://cryptography.io/en/latest/installation and be sure to install all
+   dependencies as referenced.
+
+
+Installation
+------------
+
+You can use pip for installing more.jwtauth:
+
+* ``pip install -U more.jwtauth[crypto]`` - installing with cryptography
+* ``pip install -U more.jwtauth`` - installing without cryptography
+
+Alternatively you can use buildout to install more.jwtauth.
+Remember to install cryptography manually if you need it.
+
 
 Usage
 -----
@@ -121,14 +148,6 @@ Advanced:
             leeway=10
         )
 
-Requirements
-------------
-
--  Python (2.7, 3.3, 3.4, 3.5)
--  morepath (>= 0.14)
--  PyJWT (1.4.0)
--  cryptography (1.3.1 - be sure to install all dependencies as referenced in https://cryptography.io/en/latest/installation)
-
 
 Algorithms
 ----------
@@ -145,32 +164,41 @@ HS384
 HS512
    HMAC using SHA-512 hash algorithm
 
-ES256
+ES256 [1]_
    ECDSA signature algorithm using SHA-256 hash algorithm
 
-ES384
+ES384 [1]_
    ECDSA signature algorithm using SHA-384 hash algorithm
 
-ES512
+ES512 [1]_
    ECDSA signature algorithm using SHA-512 hash algorithm
 
-PS256
+PS256 [1]_
    RSASSA-PSS signature using SHA-256 and MGF1 padding with SHA-256
 
-PS384
+PS384 [1]_
    RSASSA-PSS signature using SHA-384 and MGF1 padding with SHA-384
 
-PS512
+PS512 [1]_
    RSASSA-PSS signature using SHA-512 and MGF1 padding with SHA-512
 
-RS256
+RS256 [1]_
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-256 hash algorithm
 
-RS384
+RS384 [1]_
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-384 hash algorithm
 
-RS512
+RS512 [1]_
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
+
+.. [1] The marked algorithms require more.jwtauth to be installed
+       with its ``crypto`` dependencies::
+
+         pip install -U more.jwtauth[crypto]
+
+       See Installation_ for details. In case of problems be sure
+       to have read the note in the Requirements_ section.
+
 
 Settings
 --------

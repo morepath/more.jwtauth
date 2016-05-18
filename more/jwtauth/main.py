@@ -36,11 +36,11 @@ In the later case the algorithm must be an EC*, PS* or RS* version.
 """
 
 
-import sys
 import datetime
-import jwt
+import sys
 
-from morepath import (Identity, NO_IDENTITY)
+import jwt
+from morepath import NO_IDENTITY, Identity
 
 PY3 = sys.version_info[0] == 3
 
