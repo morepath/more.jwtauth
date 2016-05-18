@@ -51,8 +51,8 @@ Requirements
    dependencies as referenced.
 
 
-Install
--------
+Installation
+------------
 
 You can use pip for installing more.jwtauth:
 
