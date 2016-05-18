@@ -1,5 +1,6 @@
-from more.jwtauth import JWTIdentityPolicy
 import pytest
+
+from more.jwtauth import JWTIdentityPolicy
 
 try:
     from cryptography.hazmat.primitives.asymmetric import ec  # noqa

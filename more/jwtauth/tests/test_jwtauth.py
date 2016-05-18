@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import datetime
-import morepath
-from morepath import (Response, settings, Identity, NO_IDENTITY)
 
+import pytest
+
+import morepath
+from jwt import InvalidIssuerError
 from more.jwtauth import JWTIdentityPolicy
+from morepath import NO_IDENTITY, Identity, Response, settings
 from webob.exc import HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
-from jwt import InvalidIssuerError
-import pytest
 
 
 def setup_module(module):
