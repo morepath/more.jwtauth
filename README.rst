@@ -35,6 +35,33 @@ You can include all necessary information about the identity in the token so JWT
 can be used by a stateless service e.g. with external password validation.
 
 
+Requirements
+------------
+
+-  Python (2.7, 3.3, 3.4, 3.5)
+-  morepath (>= 0.14)
+-  PyJWT (1.4.0)
+-  optional: cryptography (1.3.1)
+
+.. Note::
+   If you want to use another algorithm than HMAC (HS*), you need to install
+   cryptography.
+   On some systems this can be a little tricky. Please follow the instructions
+   in https://cryptography.io/en/latest/installation and be sure to install all
+   dependencies as referenced.
+
+
+Install
+-------
+
+You can use pip for installing more.jwtauth:
+
+* ``pip install -U more.jwtauth[crypto]`` - installing with cryptography
+* ``pip install -U more.jwtauth`` - installing without cryptography
+
+Alternatively you can use buildout to install more.jwtauth.
+Remember to install cryptography if you need it.
+
 
 Usage
 -----
@@ -121,14 +148,6 @@ Advanced:
             leeway=10
         )
 
-Requirements
-------------
-
--  Python (2.7, 3.3, 3.4, 3.5)
--  morepath (>= 0.14)
--  PyJWT (1.4.0)
--  cryptography (1.3.1 - be sure to install all dependencies as referenced in https://cryptography.io/en/latest/installation)
-
 
 Algorithms
 ----------
@@ -171,6 +190,7 @@ RS384
 
 RS512
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
+
 
 Settings
 --------

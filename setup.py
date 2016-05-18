@@ -44,7 +44,7 @@ setup(
         'PyJWT == 1.4.0',
     ],
     extras_require=dict(
-        cryptography=['cryptography == 1.3.1'],
+        crypto=['cryptography == 1.3.1'],
         test=['pytest >= 2.9.1',
               'pytest-cov',
               'WebTest'],
