@@ -16,7 +16,7 @@ def relative(filepath):
 @pytest.mark.skipif(not has_crypto, reason='Not supported without cryptography library')
 class TestCryptographyAlgorithms:
 
-    def test_encode_decode_with_es256():
+    def test_encode_decode_with_es256(self):
         identity_policy = JWTIdentityPolicy(
             algorithm='ES256',
             private_key_file=relative('keys/testkey_ec'),
@@ -30,7 +30,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_es384():
+    def test_encode_decode_with_es384(self):
         identity_policy = JWTIdentityPolicy(
             algorithm='ES384',
             private_key_file=relative('keys/testkey_ec'),
@@ -44,7 +44,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_es512():
+    def test_encode_decode_with_es512(self):
         identity_policy = JWTIdentityPolicy(
             algorithm='ES512',
             private_key_file=relative('keys/testkey_ec'),
@@ -58,7 +58,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_ps256():
+    def test_encode_decode_with_ps256(self):
         identity_policy = JWTIdentityPolicy(
             algorithm='PS256',
             private_key_file=relative('keys/testkey_rsa'),
@@ -72,7 +72,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_ps384():
+    def test_encode_decode_with_ps384(self):
         identity_policy = JWTIdentityPolicy(
             algorithm='PS384',
             private_key_file=relative('keys/testkey_rsa'),
@@ -86,7 +86,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_ps512():
+    def test_encode_decode_with_ps512(self):
         identity_policy = JWTIdentityPolicy(
             algorithm='PS512',
             private_key_file=relative('keys/testkey_rsa'),
@@ -100,7 +100,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_rs256():
+    def test_encode_decode_with_rs256(self):
         identity_policy = JWTIdentityPolicy(
             algorithm='RS256',
             private_key_file=relative('keys/testkey_rsa'),
@@ -114,7 +114,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_rs384():
+    def test_encode_decode_with_rs384(self):
         identity_policy = JWTIdentityPolicy(
             algorithm='RS384',
             private_key_file=relative('keys/testkey_rsa'),
@@ -128,7 +128,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_rs512():
+    def test_encode_decode_with_rs512(self):
         identity_policy = JWTIdentityPolicy(
             algorithm='RS512',
             private_key_file=relative('keys/testkey_rsa'),
