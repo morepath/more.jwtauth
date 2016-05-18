@@ -164,32 +164,40 @@ HS384
 HS512
    HMAC using SHA-512 hash algorithm
 
-ES256
+ES256 [*]_
    ECDSA signature algorithm using SHA-256 hash algorithm
 
-ES384
+ES384 [*]_
    ECDSA signature algorithm using SHA-384 hash algorithm
 
-ES512
+ES512 [*]_
    ECDSA signature algorithm using SHA-512 hash algorithm
 
-PS256
+PS256 [*]_
    RSASSA-PSS signature using SHA-256 and MGF1 padding with SHA-256
 
-PS384
+PS384 [*]_
    RSASSA-PSS signature using SHA-384 and MGF1 padding with SHA-384
 
-PS512
+PS512 [*]_
    RSASSA-PSS signature using SHA-512 and MGF1 padding with SHA-512
 
-RS256
+RS256 [*]_
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-256 hash algorithm
 
-RS384
+RS384 [*]_
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-384 hash algorithm
 
-RS512
+RS512 [*]_
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
+
+.. [*] The marked algorithms require this library to be installed
+       with its ``crypto`` dependencies::
+
+         pip install -U more.jwtauth[crypto]
+
+       See Installation for details. In case of problems be sure
+       to have read the note in the Requirements section.
 
 
 Settings
