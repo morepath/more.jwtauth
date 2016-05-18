@@ -60,7 +60,7 @@ You can use pip for installing more.jwtauth:
 * ``pip install -U more.jwtauth`` - installing without cryptography
 
 Alternatively you can use buildout to install more.jwtauth.
-Remember to install cryptography if you need it.
+Remember to install cryptography manually if you need it.
 
 
 Usage
@@ -164,34 +164,34 @@ HS384
 HS512
    HMAC using SHA-512 hash algorithm
 
-ES256 [*]_
+ES256 [1]_
    ECDSA signature algorithm using SHA-256 hash algorithm
 
-ES384 [*]_
+ES384 [1]_
    ECDSA signature algorithm using SHA-384 hash algorithm
 
-ES512 [*]_
+ES512 [1]_
    ECDSA signature algorithm using SHA-512 hash algorithm
 
-PS256 [*]_
+PS256 [1]_
    RSASSA-PSS signature using SHA-256 and MGF1 padding with SHA-256
 
-PS384 [*]_
+PS384 [1]_
    RSASSA-PSS signature using SHA-384 and MGF1 padding with SHA-384
 
-PS512 [*]_
+PS512 [1]_
    RSASSA-PSS signature using SHA-512 and MGF1 padding with SHA-512
 
-RS256 [*]_
+RS256 [1]_
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-256 hash algorithm
 
-RS384 [*]_
+RS384 [1]_
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-384 hash algorithm
 
-RS512 [*]_
+RS512 [1]_
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
 
-.. [*] The marked algorithms require this library to be installed
+.. [1] The marked algorithms require this library to be installed
        with its ``crypto`` dependencies::
 
          pip install -U more.jwtauth[crypto]
