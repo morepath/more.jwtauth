@@ -191,7 +191,7 @@ RS384 [1]_
 RS512 [1]_
    RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
 
-.. [1] The marked algorithms require this library to be installed
+.. [1] The marked algorithms require more.jwtauth to be installed
        with its ``crypto`` dependencies::
 
          pip install -U more.jwtauth[crypto]
