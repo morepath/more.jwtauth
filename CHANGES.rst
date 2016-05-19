@@ -1,7 +1,7 @@
 CHANGES
 *******
 
-0.6 (unreleased)
+0.6 (2016-05-19)
 ================
 
 - Make Cryptography optional.
