@@ -8,7 +8,7 @@ CHANGES
 
   **Breaking Change:** For using other algorithms than HMAC you now need
   to install the ``crypto`` dependencies explicitly. Read the note in the
-  Requirements section and the new Installation section of `README.rst`_.
+  Requirements section and the new Installation section of README.rst.
 
 - Add an Installation section to the README.
 - Refactor the cryptography test suite.
