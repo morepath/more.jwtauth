@@ -56,11 +56,11 @@ Installation
 
 You can use pip for installing more.jwtauth:
 
-* ``pip install -U more.jwtauth[crypto]`` - installing with cryptography
+* ``pip install -U more.jwtauth[crypto]`` - for installing with cryptography
 * ``pip install -U more.jwtauth`` - installing without cryptography
 
 Alternatively you can use buildout to install more.jwtauth.
-Remember to install cryptography manually if you need it.
+Remember to install cryptography explicitly if you need it.
 
 
 Usage

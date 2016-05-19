@@ -7,11 +7,11 @@ CHANGES
 - Make Cryptography optional.
 
   **Breaking Change:** For using other algorithms than HMAC you now need
-  to install the ``crypto`` dependencies explicitly. See the note in the
-  Requirements section and the new Installation section of README.rst.
+  to install the ``crypto`` dependencies explicitly. Read the note in the
+  Requirements section and the new Installation section of `README.rst`_.
 
 - Add an Installation section to the README.
-- Refactoring the cryptography test suite.
+- Refactor the cryptography test suite.
 
 
 0.5 (2016-04-25)
