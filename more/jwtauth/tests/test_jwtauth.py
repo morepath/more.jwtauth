@@ -6,7 +6,7 @@ import pytest
 import morepath
 from jwt import InvalidIssuerError
 from more.jwtauth import JWTIdentityPolicy
-from morepath import NO_IDENTITY, Identity, Response, settings
+from morepath import NO_IDENTITY, Identity, Response
 from webob.exc import HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
 
@@ -29,17 +29,15 @@ def test_jwt_custom_settings():
             'leeway': 20
         }
 
-    morepath.commit(App)
-
     app = App()
-    lookup = app.lookup
+    app.commit()
 
-    assert settings(lookup=lookup).jwtauth.algorithm == "ES256"
-    assert settings(lookup=lookup).jwtauth.leeway == 20
-    assert settings(
-        lookup=lookup).jwtauth.public_key == 'MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBWcJwPEAnS/k4kFgUhxNF7J0SQQhZG+nNgy+'\
-                                             '/mXwhQ5PZIUmId1a1TjkNXiKzv6DpttBqduHbz/V0EtH+QfWy0B4BhZ5MnTyDGjcz1DQqKd'\
-                                             'exebhzobbhSIZjpYd5aU48o9rXp/OnAnrajddpGsJ0bNf4rtMLBqFYJN6LOslAB7xTBRg='
+    assert app.settings.jwtauth.algorithm == "ES256"
+    assert app.settings.jwtauth.leeway == 20
+    assert app.settings.jwtauth.public_key == \
+        'MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBWcJwPEAnS/k4kFgUhxNF7J0SQQhZG+nNgy+'\
+        '/mXwhQ5PZIUmId1a1TjkNXiKzv6DpttBqduHbz/V0EtH+QfWy0B4BhZ5MnTyDGjcz1DQqKd'\
+        'exebhzobbhSIZjpYd5aU48o9rXp/OnAnrajddpGsJ0bNf4rtMLBqFYJN6LOslAB7xTBRg='
 
 
 def test_encode_decode():
