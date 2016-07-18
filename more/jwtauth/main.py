@@ -109,7 +109,7 @@ class JWTIdentityPolicy(object):
     def remember(self, response, request, identity):
         """Remember identity on response.
 
-        Implements ``morepath.remember_identity``, which is called
+        Implements ``morepath.App.remember_identity``, which is called
         from user login code.
 
         Create a JWT token and return it as the Authorization field of the response header.
@@ -130,7 +130,7 @@ class JWTIdentityPolicy(object):
     def forget(self, response, request):
         """Forget identity on response.
 
-        Implements ``morepath.forget_identity``, which is called from
+        Implements ``morepath.App.forget_identity``, which is called from
         user logout code.
 
         This is a no-op for this identity policy. The client is supposed to handle

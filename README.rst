@@ -39,9 +39,9 @@ Requirements
 ------------
 
 -  Python (2.7, 3.3, 3.4, 3.5)
--  morepath (>= 0.14)
--  PyJWT (1.4.0)
--  optional: cryptography (1.3.1)
+-  morepath (>= 0.15)
+-  PyJWT (1.4.1)
+-  optional: cryptography (1.4)
 
 .. Note::
    If you want to use another algorithm than HMAC (HS*), you need to install
@@ -132,7 +132,7 @@ which will be stored in the JWT token and can be accessed through the morepath.I
         def remember(response):
             # We pass the extra info to the identity object.
             identity = morepath.Identity(username, fullname=fullname, email=email, role=role)
-            morepath.remember_identity(response, request, identity)
+            request.app.remember_identity(response, request, identity)
 
         return "You're logged in."  # or something more fancy
 

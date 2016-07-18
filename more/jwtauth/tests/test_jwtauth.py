@@ -11,10 +11,6 @@ from webob.exc import HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
 
 
-def setup_module(module):
-    morepath.disable_implicit()
-
-
 def test_jwt_custom_settings():
     class App(morepath.App):
         pass
@@ -169,8 +165,7 @@ def test_login():
         @request.after
         def remember(response):
             identity = Identity(username)
-            morepath.remember_identity(response, request, identity,
-                                       lookup=request.lookup)
+            request.app.remember_identity(response, request, identity)
 
         return {
             'username': username,
@@ -242,8 +237,7 @@ def test_login_with_extra_claims():
         @request.after
         def remember(response):
             identity = Identity(username, fullname=fullname, email=email, role=role)
-            morepath.remember_identity(response, request, identity,
-                                       lookup=request.lookup)
+            request.app.remember_identity(response, request, identity)
 
         return {
             'username': username,
@@ -465,8 +459,7 @@ def test_jwt_remember():
     @App.view(model=Model)
     def default(self, request):
         response = Response()
-        morepath.remember_identity(response, request, Identity('foo'),
-                                   lookup=request.lookup)
+        request.app.remember_identity(response, request, Identity('foo'))
         return response
 
     @App.setting_section(section="jwtauth")
@@ -504,7 +497,7 @@ def test_jwt_forget():
         # will not actually do anything as it's a no-op for JWT
         # auth, but at least won't crash
         response = Response(content_type='text/plain')
-        morepath.forget_identity(response, request, lookup=request.lookup)
+        request.app.forget_identity(response, request)
         return response
 
     @App.identity_policy()

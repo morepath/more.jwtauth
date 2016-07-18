@@ -40,8 +40,8 @@ setup(
     ],
     install_requires=[
         'setuptools',
-        'morepath >= 0.14',
-        'PyJWT == 1.4.0',
+        'morepath >= 0.15',
+        'PyJWT == 1.4.1',
     ],
     extras_require=dict(
         crypto=['cryptography == 1.3.1'],
