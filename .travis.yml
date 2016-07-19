@@ -11,7 +11,7 @@ env:
     - TOXENV=py33-nocrypto
     - TOXENV=py34-nocrypto
     - TOXENV=py35-nocrypto
-    - TOXENV=flake8
+    - TOXENV=pep8
     - TOXENV=coverage
 before_install:
     - pip install --upgrade pip setuptools
