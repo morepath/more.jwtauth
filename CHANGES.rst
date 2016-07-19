@@ -4,7 +4,11 @@ CHANGES
 0.7 (unreleased)
 ================
 
-- Nothing changed yet.
+- Upgrade to Morepath 0.15.
+- Upgrade to PyJWT 1.4.1 and Cryptography 1.4.
+- Add testenv for Python 3.5 and make it the default test environment.
+- Change author to "Morepath developers".
+- Clean up classifiers.
 
 
 0.6 (2016-05-19)
@@ -35,7 +39,7 @@ CHANGES
 0.4 (2016-04-13)
 ================
 
-- Upgrade to morepath 0.13.2 and update the tests.
+- Upgrade to Morepath 0.13.2 and update the tests.
 - Upgrade PyJWT to 1.3.0 and cryptography to 1.3.1.
 - Make it a PyPI package and release it. Fixes Issue #1.
 
