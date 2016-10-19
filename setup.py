@@ -37,7 +37,7 @@ setup(
         'PyJWT == 1.4.2',
     ],
     extras_require=dict(
-        crypto=['cryptography == 1.4'],
+        crypto=['cryptography == 1.5.2'],
         test=[
             'pytest >= 2.9.1',
             'pytest-remove-stale-bytecode',
@@ -45,6 +45,7 @@ setup(
         ],
         pep8=[
             'flake8',
+            'flake8-import-order',
             'pep8-naming',
         ],
         coverage=[

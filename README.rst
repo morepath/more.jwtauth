@@ -39,9 +39,9 @@ Requirements
 ------------
 
 -  Python (2.7, 3.3, 3.4, 3.5)
--  morepath (>= 0.15)
--  PyJWT (1.4.1)
--  optional: cryptography (1.4)
+-  morepath (>= 0.16.1)
+-  PyJWT (1.4.2)
+-  optional: cryptography (1.5.2)
 
 .. Note::
    If you want to use another algorithm than HMAC (HS*), you need to install
