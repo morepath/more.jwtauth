@@ -33,9 +33,8 @@ setup(
         'Development Status :: 5 - Production/Stable'
     ],
     install_requires=[
-        'setuptools',
-        'morepath >= 0.15',
-        'PyJWT == 1.4.1',
+        'morepath >= 0.16',
+        'PyJWT == 1.4.2',
     ],
     extras_require=dict(
         crypto=['cryptography == 1.4'],
