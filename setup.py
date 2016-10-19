@@ -45,7 +45,6 @@ setup(
         ],
         pep8=[
             'flake8',
-            'flake8-import-order',
             'pep8-naming',
         ],
         coverage=[

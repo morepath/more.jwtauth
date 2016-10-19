@@ -40,7 +40,7 @@ import datetime
 import sys
 
 import jwt
-from morepath import NO_IDENTITY, Identity
+from morepath import Identity, NO_IDENTITY
 
 PY3 = sys.version_info[0] == 3
 
