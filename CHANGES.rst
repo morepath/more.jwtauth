@@ -4,7 +4,11 @@ CHANGES
 0.8 (unreleased)
 ================
 
-- Nothing changed yet.
+- We now use virtualenv and pip instead of buildout to set up the
+  development environment. A development section has been
+  added to the README accordingly.
+- Review and optimize the tox configuration.
+- Upgrade to PyJWT 1.4.2 and Cryptography 1.5.2.
 
 
 0.7 (2016-07-20)
