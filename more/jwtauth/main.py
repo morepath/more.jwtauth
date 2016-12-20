@@ -167,6 +167,7 @@ class JWTIdentityPolicy(object):
             leeway = self.leeway
         else:
             leeway = 0
+        algorithms = [self.algorithm]
         options = {
             'verify_exp': self.verify_expiration,
         }
@@ -174,6 +175,7 @@ class JWTIdentityPolicy(object):
             claims_set = jwt.decode(
                 token,
                 key,
+                algorithms=algorithms,
                 options=options,
                 leeway=leeway,
                 issuer=self.issuer

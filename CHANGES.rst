@@ -4,7 +4,12 @@ CHANGES
 0.9 (unreleased)
 ================
 
-- Nothing changed yet.
+- Pass algorithm explicit to ``jwt.decode()`` to avoid some vulnerabilities.
+  For details see the blog post by Tim McLean about some
+  "`Critical vulnerabilities in JSON Web Token libraries`_".
+
+.. _Critical vulnerabilities in JSON Web Token libraries:
+  https://www.chosenplaintext.ca/2015/03/31/jwt-algorithm-confusion.html
 
 
 0.8 (2016-10-21)
