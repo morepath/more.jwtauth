@@ -13,10 +13,13 @@ The following settings are available:
     * algorithm:  The algorithm used to sign the key (defaults to HS256).
 
     * expiration_delta: Time delta from now until the token will expire.
+                        This can either be a datetime.timedelta or
+                        the number of seconds.
                         Default is 6 hours, set to None to disable.
 
-    * leeway:  The leeway, which allows you to validate an expiration time which is in the past,
-               but not very far. To use as a datetime.timedelta. Defaults is 0.
+    * leeway:  The leeway, which allows you to validate an expiration time which
+               is in the past, but not very far. To use as a datetime.timedelta
+               or the number of seconds. Defaults is 0.
 
     * verify_expiration: Default is True. If you set it to False and expiration_delta is not None,
                          you should verify the "exp" claim by yourself and if it is expired you can either
@@ -203,6 +206,8 @@ class JWTIdentityPolicy(object):
         userid_claim = self.userid_claim
         claims_set = {userid_claim: userid}
         if expiration_delta is not None:
+            if isinstance(expiration_delta, int):
+                expiration_delta = datetime.timedelta(seconds=expiration_delta)
             claims_set['exp'] = datetime.datetime.utcnow() + expiration_delta
         if issuer is not None:
             claims_set['iss'] = issuer

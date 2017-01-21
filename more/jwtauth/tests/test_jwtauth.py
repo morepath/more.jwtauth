@@ -121,7 +121,7 @@ def test_create_claim_and_encode_decode_expired():
 def test_create_claim_and_encode_decode_expired_but_with_leeway():
     identity_policy = JWTIdentityPolicy(
         master_secret='secret',
-        expiration_delta=datetime.timedelta(seconds=-2),
+        expiration_delta=-2,
         leeway=3
     )
     userid = 'user'
