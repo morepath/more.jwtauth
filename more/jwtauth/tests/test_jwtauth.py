@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import datetime
+from datetime import timedelta
 
 import pytest
 
 import morepath
-from jwt import InvalidIssuerError
-from more.jwtauth import JWTIdentityPolicy
+from more.jwtauth import (
+    JWTIdentityPolicy, ExpiredSignatureError, InvalidIssuerError
+)
 from morepath import Identity, NO_IDENTITY, Response
 from webob.exc import HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
@@ -18,9 +19,11 @@ def test_jwt_custom_settings():
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
         return {
-            'public_key': 'MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBWcJwPEAnS/k4kFgUhxNF7J0SQQhZG+nNgy+'
-                          '/mXwhQ5PZIUmId1a1TjkNXiKzv6DpttBqduHbz/V0EtH+QfWy0B4BhZ5MnTyDGjcz1DQqKd'
-                          'exebhzobbhSIZjpYd5aU48o9rXp/OnAnrajddpGsJ0bNf4rtMLBqFYJN6LOslAB7xTBRg=',
+            'public_key': 'MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBWcJwPEAnS/k4kFg'
+                          'UhxNF7J0SQQhZG+nNgy+/mXwhQ5PZIUmId1a1TjkNXiKzv6Dptt'
+                          'BqduHbz/V0EtH+QfWy0B4BhZ5MnTyDGjcz1DQqKdexebhzobbhS'
+                          'IZjpYd5aU48o9rXp/OnAnrajddpGsJ0bNf4rtMLBqFYJN6LOslA'
+                          'B7xTBRg=',
             'algorithm': "ES256",
             'leeway': 20
         }
@@ -31,9 +34,10 @@ def test_jwt_custom_settings():
     assert app.settings.jwtauth.algorithm == "ES256"
     assert app.settings.jwtauth.leeway == 20
     assert app.settings.jwtauth.public_key == \
-        'MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBWcJwPEAnS/k4kFgUhxNF7J0SQQhZG+nNgy+'\
-        '/mXwhQ5PZIUmId1a1TjkNXiKzv6DpttBqduHbz/V0EtH+QfWy0B4BhZ5MnTyDGjcz1DQqKd'\
-        'exebhzobbhSIZjpYd5aU48o9rXp/OnAnrajddpGsJ0bNf4rtMLBqFYJN6LOslAB7xTBRg='
+        'MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBWcJwPEAnS/k4kFgUhxNF7J0SQQhZG+nN'\
+        'gy+/mXwhQ5PZIUmId1a1TjkNXiKzv6DpttBqduHbz/V0EtH+QfWy0B4BhZ5MnTyDGjcz'\
+        '1DQqKdexebhzobbhSIZjpYd5aU48o9rXp/OnAnrajddpGsJ0bNf4rtMLBqFYJN6LOslA'\
+        'B7xTBRg='
 
 
 def test_encode_decode():
@@ -59,7 +63,8 @@ def test_encode_decode_with_unicode():
 
 
 def test_encode_decode_with_issuer():
-    identity_policy = JWTIdentityPolicy(master_secret='secret', issuer='Issuer_App')
+    identity_policy = JWTIdentityPolicy(master_secret='secret',
+                                        issuer='Issuer_App')
     userid = 'user'
 
     extra_claims = {
@@ -81,7 +86,7 @@ def test_encode_decode_with_issuer():
     assert claims_set_decoded == claims_set
 
 
-def test_create_claim_and_encode_decode_and_get_userid_and_get_extra_claims():
+def test_create_claims_and_encode_decode_and_get_userid_and_get_extra_claims():
     identity_policy = JWTIdentityPolicy(master_secret='secret')
     userid = 'user'
     extra_claims = {
@@ -105,20 +110,21 @@ def test_get_userid_without_userid():
     assert identity_policy.get_userid(claims_set_decoded) is None
 
 
-def test_create_claim_and_encode_decode_expired():
+def test_create_claims_and_encode_decode_expired():
     identity_policy = JWTIdentityPolicy(
         master_secret='secret',
-        expiration_delta=datetime.timedelta(seconds=-2)
+        expiration_delta=timedelta(seconds=-2)
     )
     userid = 'user'
     claims_set = identity_policy.create_claims_set(userid)
     token = identity_policy.encode_jwt(claims_set)
-    claims_set_decoded = identity_policy.decode_jwt(token)
 
-    assert claims_set_decoded is None
+    with pytest.raises(ExpiredSignatureError) as excinfo:
+        identity_policy.decode_jwt(token)
+    assert 'Signature has expired' in str(excinfo.value)
 
 
-def test_create_claim_and_encode_decode_expired_but_with_leeway():
+def test_create_claims_and_encode_decode_expired_but_with_leeway():
     identity_policy = JWTIdentityPolicy(
         master_secret='secret',
         expiration_delta=-2,
@@ -136,13 +142,6 @@ def test_login():
     class App(morepath.App):
         pass
 
-    @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
-        return {
-            'master_secret': 'secret',
-            'expiration_delta': None,
-        }
-
     @App.identity_policy()
     def get_identity_policy(settings):
         jwtauth_settings = settings.jwtauth.__dict__.copy()
@@ -154,6 +153,9 @@ def test_login():
     @App.path(model=Login, path='login')
     def get_login():
         return Login()
+
+    def user_has_password(username, password):
+        return username == 'user' and password == 'password'
 
     @App.json(model=Login, request_method='POST')
     def login(self, request):
@@ -171,8 +173,17 @@ def test_login():
             'username': username,
         }
 
-    def user_has_password(username, password):
-        return username == 'user' and password == 'password'
+    settings = {
+        'master_secret': 'secret',
+        'expiration_delta': None,
+        'refresh_delta': None
+    }
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return settings
+
+    identity_policy = JWTIdentityPolicy(**settings)
 
     morepath.commit(App)
     c = Client(App())
@@ -183,11 +194,6 @@ def test_login():
     assert r.json == {
         'username': 'user',
     }
-
-    identity_policy = JWTIdentityPolicy(
-        master_secret='secret',
-        expiration_delta=None
-    )
 
     claims_set = {
         'sub': 'user'
@@ -205,12 +211,6 @@ def test_login_with_extra_claims():
     class App(morepath.App):
         pass
 
-    @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
-        return {
-            'master_secret': 'secret',
-        }
-
     @App.identity_policy()
     def get_identity_policy(settings):
         jwtauth_settings = settings.jwtauth.__dict__.copy()
@@ -222,6 +222,9 @@ def test_login_with_extra_claims():
     @App.path(model=Login, path='login')
     def get_login():
         return Login()
+
+    def user_has_password(username, password):
+        return username == 'user' and password == 'password'
 
     @App.json(model=Login, request_method='POST')
     def login(self, request):
@@ -236,7 +239,8 @@ def test_login_with_extra_claims():
 
         @request.after
         def remember(response):
-            identity = Identity(username, fullname=fullname, email=email, role=role)
+            identity = Identity(username, fullname=fullname,
+                                email=email, role=role)
             request.app.remember_identity(response, request, identity)
 
         return {
@@ -246,8 +250,15 @@ def test_login_with_extra_claims():
             'role': role
         }
 
-    def user_has_password(username, password):
-        return username == 'user' and password == 'password'
+    settings = {
+        'master_secret': 'secret'
+    }
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return settings
+
+    identity_policy = JWTIdentityPolicy(**settings)
 
     morepath.commit(App)
     c = Client(App())
@@ -274,10 +285,6 @@ def test_login_with_extra_claims():
         'email': 'harry@potter.com',
         'role': 'wizard'
     }
-
-    identity_policy = JWTIdentityPolicy(
-        master_secret='secret',
-    )
 
     authtype, token = r.headers['Authorization'].split(' ', 1)
     claims_set_decoded = identity_policy.decode_jwt(token)
@@ -316,12 +323,6 @@ def test_jwt_identity_policy():
     def default(self, request):
         return "Model: %s" % self.id
 
-    @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
-        return {
-            'master_secret': 'secret',
-        }
-
     @App.identity_policy()
     def get_identity_policy(settings):
         jwtauth_settings = settings.jwtauth.__dict__.copy()
@@ -332,13 +333,19 @@ def test_jwt_identity_policy():
         assert identity is not NO_IDENTITY
         return True
 
+    settings = {
+        'master_secret': 'secret',
+    }
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return settings
+
+    identity_policy = JWTIdentityPolicy(**settings)
+
     morepath.commit(App)
 
     c = Client(App())
-
-    identity_policy = JWTIdentityPolicy(
-        master_secret='secret',
-    )
 
     response = c.get('/foo', status=403)
 
@@ -392,12 +399,14 @@ def test_jwt_identity_policy_errors():
     def default(self, request):
         return "Model: %s" % self.id
 
+    settings = {
+        'master_secret': u'sëcret',
+        'leeway': None
+    }
+
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
-        return {
-            'master_secret': u'sëcret',
-            'leeway': None
-        }
+        return settings
 
     @App.identity_policy()
     def get_identity_policy(settings):
@@ -409,13 +418,11 @@ def test_jwt_identity_policy_errors():
         assert identity is not NO_IDENTITY
         return True
 
+    identity_policy = JWTIdentityPolicy(**settings)
+
     morepath.commit(App)
 
     c = Client(App())
-
-    identity_policy = JWTIdentityPolicy(
-        master_secret=u'sëcret'
-    )
 
     response = c.get('/foo', status=403)
 
@@ -462,11 +469,13 @@ def test_jwt_remember():
         request.app.remember_identity(response, request, Identity('foo'))
         return response
 
+    settings = {
+        'master_secret': 'secret',
+    }
+
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
-        return {
-            'master_secret': 'secret',
-        }
+        return settings
 
     @App.identity_policy()
     def get_identity_policy(settings):

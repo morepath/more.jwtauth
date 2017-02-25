@@ -4,12 +4,40 @@ CHANGES
 0.9 (unreleased)
 ================
 
+- **New:** Add an API to refresh the JWT token (see issue `#6`_).
+
+  This implement adding 4 new settings:
+
+  * ``allow_refresh``: Enables the token refresh API when True.
+  * ``refresh_delta``: The time delta in which the token can be refreshed
+    considering the leeway.
+  * ``refresh_nonce_handler``: Dotted path to callback function, which receives
+    the userid as argument and returns a nonce which will be validated before
+    refreshing.
+  * ``verify_expiration_on_refresh``: If False, expiration_delta for the JWT
+    token will not be checked during refresh.
+    Otherwise you can refresh the token only if it's not yet expired.
+
+  It also adds 2 claims to the token when refreshing is enabled:
+
+  * ``refresh_until``: Timestamp until which the token can be refreshed.
+  * ``nonce``: The nonce which was returned by ``refresh_nonce_handler``.
+
+  For details see README.rst.
+
+- **Removed:** The ``verify_expiration`` setting has been removed as it was
+  mainly for custom handling of token refreshing, which is now obsolente.
+
 - Pass algorithm explicit to ``jwt.decode()`` to avoid some vulnerabilities.
   For details see the blog post by Tim McLean about some
   "`Critical vulnerabilities in JSON Web Token libraries`_".
-- Allow expiration_delta and leeway as number of seconds in addition to 
+
+- Allow expiration_delta and leeway as number of seconds in addition to
   datetime.timedelta.
 
+- Some code cleanup and refactoring.
+
+.. _#6: https://github.com/morepath/more.jwtauth/issues/6
 .. _Critical vulnerabilities in JSON Web Token libraries:
   https://www.chosenplaintext.ca/2015/03/31/jwt-algorithm-confusion.html
 

@@ -5,7 +5,7 @@ from more.jwtauth import JWTIdentityPolicy
 try:
     from cryptography.hazmat.primitives.asymmetric import ec  # noqa
     has_crypto = True
-except ImportError:
+except ImportError:   # pragma: no cover
     has_crypto = False
 
 
@@ -14,8 +14,28 @@ def relative(filepath):
     return os.path.join(os.path.dirname(__file__), filepath)
 
 
-@pytest.mark.skipif(not has_crypto, reason='Not supported without cryptography library')
+@pytest.mark.skipif(not has_crypto,
+                    reason='Not supported without cryptography library')
 class TestCryptographyAlgorithms:
+
+    def test_encode_decode_with_es256_as_bytes(self):
+        with open(relative('keys/testkey_ec'), 'r') as key_priv_file:
+            private_key = key_priv_file.read()
+        with open(relative('keys/testkey_ec.pub'), 'r') as key_pub_file:
+            public_key = key_pub_file.read()
+
+        identity_policy = JWTIdentityPolicy(
+            algorithm='ES256',
+            private_key=private_key,
+            public_key=public_key
+        )
+        claims_set = {
+            'sub': 'user'
+        }
+        token = identity_policy.encode_jwt(claims_set)
+        claims_set_decoded = identity_policy.decode_jwt(token)
+
+        assert claims_set_decoded == claims_set
 
     def test_encode_decode_with_es256(self):
         identity_policy = JWTIdentityPolicy(
