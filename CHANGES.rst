@@ -1,7 +1,7 @@
 CHANGES
 =======
 
-0.9 (unreleased)
+0.9 (2017-03-02)
 ----------------
 
 - **New:** Add an API to refresh the JWT token (see issue `#6`_).
