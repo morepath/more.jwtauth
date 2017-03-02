@@ -464,9 +464,9 @@ Developing more.jwtauth
 Install more.jwtauth for development
 ------------------------------------
 
-.. highlight:: console
-
 Clone more.jwtauth from github::
+
+.. code-block:: console
 
   $ git clone git@github.com:morepath/more.jwtauth.git
 
@@ -475,24 +475,34 @@ you need to upload your ssh public key to github_.
 
 Then go to the more.jwtauth directory::
 
+.. code-block:: console
+
   $ cd more.jwtauth
 
 Make sure you have virtualenv_ installed.
 
 Create a new virtualenv for Python 3 inside the more.jwtauth directory::
 
+.. code-block:: console
+
   $ virtualenv -p python3 env/py3
 
 Activate the virtualenv::
+
+.. code-block:: console
 
   $ source env/py3/bin/activate
 
 Make sure you have recent setuptools and pip installed::
 
+.. code-block:: console
+
   $ pip install -U setuptools pip
 
 Install the various dependencies and development tools from
 develop_requirements.txt::
+
+.. code-block:: console
 
   $ pip install -Ur develop_requirements.txt
 
@@ -501,9 +511,13 @@ For upgrading the requirements just run the command again.
 If you want to test more.jwtauth with Python 2.7 as well you can create a
 second virtualenv for it::
 
+.. code-block:: console
+
   $ virtualenv -p python2.7 env/py27
 
 You can then activate it::
+
+.. code-block:: console
 
   $ source env/py27/bin/activate
 
@@ -519,9 +533,13 @@ Running the tests
 
 You can run the tests using `py.test`_::
 
+.. code-block:: console
+
   $ py.test
 
 To generate test coverage information as HTML do::
+
+.. code-block:: console
 
   $ py.test --cov --cov-report html
 
@@ -539,9 +557,13 @@ mistakes using pyflakes_, check for PEP8_ style compliance and
 can do `cyclomatic complexity`_ checking. To do pyflakes and pep8
 checking do::
 
+.. code-block:: console
+
   $ flake8 more.jwtauth
 
 To also show cyclomatic complexity, use this command::
+
+.. code-block:: console
 
   $ flake8 --max-complexity=10 more.jwtauth
 
@@ -562,13 +584,19 @@ One tool you can use to install multiple versions of Python is pyenv_.
 
 To find out which test environments are defined for Morepath in tox.ini run::
 
+.. code-block:: console
+
   $ tox -l
 
 You can run all tox tests with::
 
+.. code-block:: console
+
   $ tox
 
 You can also specify a test environment to run e.g.::
+
+.. code-block:: console
 
   $ tox -e py35
   $ tox -e pep8

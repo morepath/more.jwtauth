@@ -1,8 +1,8 @@
 CHANGES
-*******
+=======
 
 0.9 (unreleased)
-================
+----------------
 
 - **New:** Add an API to refresh the JWT token (see issue `#6`_).
 
@@ -43,7 +43,7 @@ CHANGES
 
 
 0.8 (2016-10-21)
-================
+----------------
 
 - We now use virtualenv and pip instead of buildout to set up the
   development environment. A development section has been
@@ -53,7 +53,7 @@ CHANGES
 
 
 0.7 (2016-07-20)
-================
+----------------
 
 - Upgrade to Morepath 0.15.
 - Upgrade to PyJWT 1.4.1 and Cryptography 1.4.
@@ -63,7 +63,7 @@ CHANGES
 
 
 0.6 (2016-05-19)
-================
+----------------
 
 - Make Cryptography optional.
 
@@ -76,7 +76,7 @@ CHANGES
 
 
 0.5 (2016-04-25)
-================
+----------------
 
 - Adding some tests.
 - Increase coverage to 100%.
@@ -88,7 +88,7 @@ CHANGES
 
 
 0.4 (2016-04-13)
-================
+----------------
 
 - Upgrade to Morepath 0.13.2 and update the tests.
 - Upgrade PyJWT to 1.3.0 and cryptography to 1.3.1.
@@ -96,7 +96,7 @@ CHANGES
 
 
 0.3 (2016-04-13)
-================
+----------------
 
 - Upgrade PyJWT to 1.4.0 and cryptography to 0.9.1.
 - Python 3.2 is no longer a supported platform. This version of Python is rarely used.
@@ -104,7 +104,7 @@ CHANGES
 - Some cleanup.
 
 0.2 (2015-06-29)
-================
+----------------
 
 - Integrate the set_jwt_auth_header function into the identity policy as remember method.
 
@@ -123,6 +123,6 @@ CHANGES
 
 
 0.1 (2015-04-15)
-================
+----------------
 
 - Initial public release.
