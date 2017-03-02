@@ -33,9 +33,9 @@ The following settings are available:
         This can either be a datetime.timedelta or the number of seconds.
         Default is 7 days. When None you can always refresh the token.
 
-    * refresh_nonce_handler: Dotted path to callback function, which receives
-        the userid as argument and returns a nonce which will be validated
-        before refreshing.
+    * refresh_nonce_handler: Either dotted path to callback function or the
+        callback function itself, which receives the userid as argument and
+        returns a nonce which will be validated before refreshing.
         When None no nonce will be created or validated for refreshing.
         Default is None.
 
@@ -137,7 +137,11 @@ class JWTIdentityPolicy(object):
         if isinstance(refresh_delta, timedelta):
             refresh_delta = refresh_delta.total_seconds()
         self.refresh_delta = refresh_delta
-        self.refresh_nonce_handler = handler(refresh_nonce_handler)
+
+        if isinstance(refresh_nonce_handler, str):
+            self.refresh_nonce_handler = handler(refresh_nonce_handler)
+        else:
+            self.refresh_nonce_handler = refresh_nonce_handler
         self.verify_expiration_on_refresh = verify_expiration_on_refresh
         self.issuer = issuer
         self.auth_header_prefix = auth_header_prefix

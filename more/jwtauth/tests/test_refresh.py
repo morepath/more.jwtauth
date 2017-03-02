@@ -77,17 +77,20 @@ def test_refresh_token():
 
     refresh_nonce_handler = 'more.jwtauth.tests.handler.refresh_nonce_handler'
     refresh_delta = 3600
-    settings = {
-        'master_secret': 'secret',
-        'allow_refresh': True,
-        'refresh_delta': refresh_delta,
-        'refresh_nonce_handler': refresh_nonce_handler
-    }
 
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
-        return settings
+        return {
+            'master_secret': 'secret',
+            'allow_refresh': True,
+            'refresh_delta': refresh_delta,
+            'refresh_nonce_handler': refresh_nonce_handler
+        }
 
+    morepath.commit(App)
+    app = App()
+
+    settings = app.settings.jwtauth.__dict__.copy()
     identity_policy = JWTIdentityPolicy(**settings)
 
     now = timegm(datetime.utcnow().utctimetuple())
@@ -101,8 +104,82 @@ def test_refresh_token():
     token = identity_policy.encode_jwt(claims_set)
     headers = {'Authorization': 'JWT ' + token}
 
+    c = Client(app)
+
+    r = c.get('/refresh', headers=headers)
+
+    assert r.json == {
+        'userid': 'user',
+    }
+
+    authtype, token = r.headers['Authorization'].split(' ', 1)
+    claims_set_decoded = identity_policy.decode_jwt(token)
+
+    assert identity_policy.get_userid(claims_set_decoded) == 'user'
+
+
+def test_refresh_nonce_handler_set_by_decorator():
+    class App(morepath.App):
+        pass
+
+    class Refresh(object):
+        pass
+
+    @App.identity_policy()
+    def get_identity_policy(settings):
+        jwtauth_settings = settings.jwtauth.__dict__.copy()
+        return JWTIdentityPolicy(**jwtauth_settings)
+
+    @App.path(model=Refresh, path='refresh')
+    def get_refresh():
+        return Refresh()
+
+    @App.json(model=Refresh)
+    def refresh(self, request):
+        userid = verify_refresh_request(request)
+
+        @request.after
+        def remember(response):
+            identity = Identity(userid)
+            request.app.remember_identity(response, request, identity)
+
+        return {
+            'userid': userid
+        }
+
+    refresh_delta = 3600
+
+    @App.setting(section="jwtauth", name="refresh_nonce_handler")
+    def get_handler():
+        def refresh_nonce_handler(userid):
+            return '__' + userid + '__'
+        return refresh_nonce_handler
+
+    @App.setting_section(section="jwtauth")
+    def get_jwtauth_settings():
+        return {
+            'master_secret': 'secret',
+            'allow_refresh': True,
+            'refresh_delta': refresh_delta
+        }
+
     morepath.commit(App)
-    c = Client(App())
+    app = App()
+    c = Client(app)
+
+    settings = app.settings.jwtauth.__dict__.copy()
+    identity_policy = JWTIdentityPolicy(**settings)
+
+    now = timegm(datetime.utcnow().utctimetuple())
+
+    claims_set = {
+        'sub': 'user',
+        'refresh_until': now + refresh_delta,
+        'nonce': '__user__'
+    }
+
+    token = identity_policy.encode_jwt(claims_set)
+    headers = {'Authorization': 'JWT ' + token}
 
     r = c.get('/refresh', headers=headers)
 
