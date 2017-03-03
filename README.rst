@@ -214,6 +214,7 @@ a closure which returns the handler function:
 
 .. code-block:: python
 
+  from .app import App
   from .model import User
 
 
