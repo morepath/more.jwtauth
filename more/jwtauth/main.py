@@ -372,6 +372,8 @@ class JWTIdentityPolicy(object):
             claims_set = self.decode_jwt(
                 token, self.verify_expiration_on_refresh
             )
+
+        # reraise the exceptions to change the error messages
         except DecodeError:
             raise DecodeError('Token could not be decoded')
         except ExpiredSignatureError:
