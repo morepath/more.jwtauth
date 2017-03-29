@@ -363,7 +363,7 @@ algorithm
 expiration_delta
   Time delta from now until the token will expire. Set to None to disable.
   This can either be a datetime.timedelta or the number of seconds.
-  Default is 6 hours.
+  Default is 30 minutes.
 
 leeway
   The leeway, which allows you to validate an expiration time which is in the
