@@ -190,7 +190,7 @@ class JWTIdentityPolicy(object):
         """
         claims = identity.as_dict()
         userid = claims.pop('userid')
-        claims_set = self.create_claims_set(userid, claims)
+        claims_set = self.create_claims_set(userid, request, claims)
         token = self.encode_jwt(claims_set)
         response.headers['Authorization'] = '%s %s' % (self.auth_header_prefix,
                                                        token)
@@ -238,7 +238,7 @@ class JWTIdentityPolicy(object):
             issuer=self.issuer
         )
 
-    def create_claims_set(self, userid, extra_claims=None):
+    def create_claims_set(self, userid, request=None, extra_claims=None):
         """Create the claims set based on the userid of the claimed identity,
         the settings and the extra_claims dictionary.
 
@@ -271,7 +271,7 @@ class JWTIdentityPolicy(object):
             if self.refresh_delta is not None:
                 claims_set['refresh_until'] = now + self.refresh_delta
             if self.refresh_nonce_handler is not None:
-                claims_set['nonce'] = self.refresh_nonce_handler(userid)
+                claims_set['nonce'] = self.refresh_nonce_handler(userid, request)
         if extra_claims is not None:
             claims_set.update(extra_claims)
         return claims_set
@@ -386,7 +386,7 @@ class JWTIdentityPolicy(object):
         if self.refresh_nonce_handler is not None:
             if 'nonce' not in claims_set:
                 raise MissingRequiredClaimError('nonce')
-            if self.refresh_nonce_handler(userid) != claims_set['nonce']:
+            if self.refresh_nonce_handler(userid, request) != claims_set['nonce']:
                 raise InvalidTokenError('Refresh nonce is not valid')
 
         if self.refresh_delta is not None:
