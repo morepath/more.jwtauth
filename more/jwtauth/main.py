@@ -271,8 +271,8 @@ class JWTIdentityPolicy(object):
             if self.refresh_delta is not None:
                 claims_set['refresh_until'] = now + self.refresh_delta
             if self.refresh_nonce_handler is not None:
-                claims_set['nonce'] = self.refresh_nonce_handler(userid,
-                                                                 request)
+                claims_set['nonce'] = self.refresh_nonce_handler(request,
+                                                                 userid)
         if extra_claims is not None:
             claims_set.update(extra_claims)
         return claims_set
@@ -387,8 +387,8 @@ class JWTIdentityPolicy(object):
         if self.refresh_nonce_handler is not None:
             if 'nonce' not in claims_set:
                 raise MissingRequiredClaimError('nonce')
-            if self.refresh_nonce_handler(userid,
-                                          request) != claims_set['nonce']:
+            if self.refresh_nonce_handler(request,
+                                          userid) != claims_set['nonce']:
                 raise InvalidTokenError('Refresh nonce is not valid')
 
         if self.refresh_delta is not None:

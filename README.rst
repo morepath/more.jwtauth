@@ -220,7 +220,7 @@ a closure which returns the handler function:
 
   @App.setting(section="jwtauth", name="refresh_nonce_handler")
   def get_handler():
-    def refresh_nonce_handler(userid):
+    def refresh_nonce_handler(request, userid):
         # This returns a nonce from the user endity
         # which can just be an UUID you created before.
         return User.get(username=userid).nonce
