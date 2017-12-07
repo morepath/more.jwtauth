@@ -37,7 +37,7 @@ def test_create_claims_with_refresh_until_and_nonce():
     )
 
     userid = 'user'
-    claims_set = identity_policy.create_claims_set(userid, None)
+    claims_set = identity_policy.create_claims_set(None, userid)
 
     now = timegm(datetime.utcnow().utctimetuple())
 

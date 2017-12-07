@@ -190,7 +190,7 @@ class JWTIdentityPolicy(object):
         """
         claims = identity.as_dict()
         userid = claims.pop('userid')
-        claims_set = self.create_claims_set(userid, request, claims)
+        claims_set = self.create_claims_set(request, userid, claims)
         token = self.encode_jwt(claims_set)
         response.headers['Authorization'] = '%s %s' % (self.auth_header_prefix,
                                                        token)
@@ -238,7 +238,7 @@ class JWTIdentityPolicy(object):
             issuer=self.issuer
         )
 
-    def create_claims_set(self, userid, request=None, extra_claims=None):
+    def create_claims_set(self, request, userid, extra_claims=None):
         """Create the claims set based on the userid of the claimed identity,
         the settings and the extra_claims dictionary.
 
