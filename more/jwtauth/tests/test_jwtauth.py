@@ -70,7 +70,7 @@ def test_encode_decode_with_issuer():
     extra_claims = {
         'iss': 'Invalid_Issuer_App'
     }
-    claims_set = identity_policy.create_claims_set(userid, extra_claims)
+    claims_set = identity_policy.create_claims_set(userid, None, extra_claims)
     token = identity_policy.encode_jwt(claims_set)
 
     with pytest.raises(InvalidIssuerError):
@@ -93,7 +93,7 @@ def test_create_claims_and_encode_decode_and_get_userid_and_get_extra_claims():
         'email': 'user@example.com',
         'role': 'admin'
     }
-    claims_set = identity_policy.create_claims_set(userid, extra_claims)
+    claims_set = identity_policy.create_claims_set(userid, None, extra_claims)
     token = identity_policy.encode_jwt(claims_set)
     claims_set_decoded = identity_policy.decode_jwt(token)
 

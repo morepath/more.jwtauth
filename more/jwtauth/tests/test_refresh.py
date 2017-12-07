@@ -18,7 +18,7 @@ def test_handler():
     refresh_nonce_handler = handler(
         'more.jwtauth.tests.handler.refresh_nonce_handler'
     )
-    assert refresh_nonce_handler('user') == '__user__'
+    assert refresh_nonce_handler('user', None) == '__user__'
 
     with pytest.raises(ImportError) as excinfo:
         handler('refresh_nonce_handler')
@@ -37,7 +37,7 @@ def test_create_claims_with_refresh_until_and_nonce():
     )
 
     userid = 'user'
-    claims_set = identity_policy.create_claims_set(userid)
+    claims_set = identity_policy.create_claims_set(userid, None)
 
     now = timegm(datetime.utcnow().utctimetuple())
 
@@ -151,7 +151,7 @@ def test_refresh_nonce_handler_set_by_decorator():
 
     @App.setting(section="jwtauth", name="refresh_nonce_handler")
     def get_handler():
-        def refresh_nonce_handler(userid):
+        def refresh_nonce_handler(userid, request):
             return '__' + userid + '__'
         return refresh_nonce_handler
 
