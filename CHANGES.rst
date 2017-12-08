@@ -1,7 +1,7 @@
 CHANGES
 =======
 
-0.10 (unreleased)
+0.10 (2017-12-08)
 -----------------
 
 - **New:** Add request parameter to refresh_nonce_handler (see issue `#8`_).
