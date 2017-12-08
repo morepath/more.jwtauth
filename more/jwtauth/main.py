@@ -258,6 +258,8 @@ class JWTIdentityPolicy(object):
         claims containing extra info
         about the identity, which will be stored in the Identity object.
 
+        :param request: current request object.
+        :type request: :class:`morepath.Request`
         :param userid:  the userid of the claimed identity.
         :param extra_claims: dictionary, containing additional claims or None.
         """
@@ -356,7 +358,7 @@ class JWTIdentityPolicy(object):
         an updated identity with ``remember_identity``.
         Otherwise it raises an exception based on InvalidTokenError.
 
-        :param request: request object
+        :param request: current request object
         :type request: :class:`morepath.Request`
         :returns: userid
         :raises: InvalidTokenError, ExpiredSignatureError, DecodeError,

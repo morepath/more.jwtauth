@@ -181,8 +181,8 @@ To help you with this more.jwtauth has a refresh API, which uses 4 settings:
     considering the leeway.
     Default is 7 days. When None you can always refresh the token.
 * ``refresh_nonce_handler``: Either dotted path to callback function or the
-    callback function itself, which receives the userid as argument and returns
-    a nonce which will be validated before refreshing.
+    callback function itself, which receives the current request and the userid
+    as arguments and returns a nonce which will be validated before refreshing.
     When None no nonce will be created or validated for refreshing.
 * ``verify_expiration_on_refresh``: If False, expiration_delta for the JWT
     token will not be checked during refresh. Otherwise you can refresh the
