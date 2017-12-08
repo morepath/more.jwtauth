@@ -4,7 +4,9 @@ CHANGES
 0.10 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- **New:** Add request parameter to refresh_nonce_handler (see issue `#8`_).
+
+.. _#8: https://github.com/morepath/more.jwtauth/issues/8
 
 
 0.9 (2017-03-02)
