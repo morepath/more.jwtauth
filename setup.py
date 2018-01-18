@@ -34,10 +34,10 @@ setup(
     ],
     install_requires=[
         'morepath >= 0.16.1',
-        'PyJWT == 1.4.2',
+        'PyJWT == 1.5.3',
     ],
     extras_require=dict(
-        crypto=['cryptography == 1.5.2'],
+        crypto=['cryptography == 2.1.4'],
         test=[
             'pytest >= 2.9.1',
             'pytest-remove-stale-bytecode',

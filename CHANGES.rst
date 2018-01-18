@@ -5,12 +5,13 @@ CHANGES
 -----------------
 
 - Remove support for Python 3.3 and add support for Python 3.6.
+- Upgrade PyJWT to version 1.5.3 and cryptography to version 2.1.4.
 
 
 0.10 (2017-12-08)
 -----------------
 
-- **New:** Add request parameter to refresh_nonce_handler (see issue `#8`_).
+- **Breaking:** Add request parameter to refresh_nonce_handler (see issue `#8`_).
 
 .. _#8: https://github.com/morepath/more.jwtauth/issues/8
 
