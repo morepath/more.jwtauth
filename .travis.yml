@@ -4,13 +4,13 @@ python: 3.5
 cache: pip
 env:
     - TOXENV=py27-crypto
-    - TOXENV=py33-crypto
     - TOXENV=py34-crypto
     - TOXENV=py35-crypto
+    - TOXENV=py36-crypto
     - TOXENV=py27-nocrypto
-    - TOXENV=py33-nocrypto
     - TOXENV=py34-nocrypto
     - TOXENV=py35-nocrypto
+    - TOXENV=py36-nocrypto
     - TOXENV=pep8
     - TOXENV=coverage
 before_install:
