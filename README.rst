@@ -45,17 +45,16 @@ external password validation.
 Requirements
 ------------
 
--  Python (2.7, 3.3, 3.4, 3.5)
+-  Python (2.7, 3.4, 3.5, 3.6)
 -  morepath (>= 0.16.1)
--  PyJWT (1.4.2)
--  optional: cryptography (1.5.2)
+-  PyJWT (1.5.3)
+-  optional: cryptography (2.1.4)
 
 .. Note::
    If you want to use another algorithm than HMAC (HS*), you need to install
    cryptography.
    On some systems this can be a little tricky. Please follow the instructions
-   in https://cryptography.io/en/latest/installation and be sure to install all
-   dependencies as referenced.
+   in https://cryptography.io/en/latest/installation.
 
 
 Installation
