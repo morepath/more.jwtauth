@@ -1,7 +1,7 @@
 CHANGES
 =======
 
-0.11 (unreleased)
+0.11 (2018-01-18)
 -----------------
 
 - Remove support for Python 3.3 and add support for Python 3.6.
