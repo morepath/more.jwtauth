@@ -33,11 +33,11 @@ setup(
         'Development Status :: 5 - Production/Stable'
     ],
     install_requires=[
-        'morepath >= 0.16.1',
-        'PyJWT == 1.5.3',
+        'morepath >= 0.19',
+        'PyJWT == 1.7.1',
     ],
     extras_require=dict(
-        crypto=['cryptography == 2.1.4'],
+        crypto=['cryptography == 2.9.2'],
         test=[
             'pytest >= 2.9.1',
             'pytest-remove-stale-bytecode',
