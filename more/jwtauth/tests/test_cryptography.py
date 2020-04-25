@@ -19,9 +19,9 @@ def relative(filepath):
 class TestCryptographyAlgorithms:
 
     def test_encode_decode_with_es256_as_bytes(self):
-        with open(relative('keys/testkey_ec'), 'r') as key_priv_file:
+        with open(relative('keys/testkey_ec')) as key_priv_file:
             private_key = key_priv_file.read()
-        with open(relative('keys/testkey_ec.pub'), 'r') as key_pub_file:
+        with open(relative('keys/testkey_ec.pub')) as key_pub_file:
             public_key = key_pub_file.read()
 
         identity_policy = JWTIdentityPolicy(

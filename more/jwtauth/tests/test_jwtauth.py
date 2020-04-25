@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from datetime import timedelta
 
 import pytest
@@ -147,7 +146,7 @@ def test_login():
         jwtauth_settings = settings.jwtauth.__dict__.copy()
         return JWTIdentityPolicy(**jwtauth_settings)
 
-    class Login(object):
+    class Login:
         pass
 
     @App.path(model=Login, path='login')
@@ -199,7 +198,7 @@ def test_login():
         'sub': 'user'
     }
     expected_token = identity_policy.encode_jwt(claims_set)
-    assert r.headers['Authorization'] == '%s %s' % ('JWT', expected_token)
+    assert r.headers['Authorization'] == '{} {}'.format('JWT', expected_token)
 
     authtype, token = r.headers['Authorization'].split(' ', 1)
     claims_set_decoded = identity_policy.decode_jwt(token)
@@ -216,7 +215,7 @@ def test_login_with_extra_claims():
         jwtauth_settings = settings.jwtauth.__dict__.copy()
         return JWTIdentityPolicy(**jwtauth_settings)
 
-    class Login(object):
+    class Login:
         pass
 
     @App.path(model=Login, path='login')
@@ -303,11 +302,11 @@ def test_jwt_identity_policy():
     class App(morepath.App):
         pass
 
-    class Model(object):
+    class Model:
         def __init__(self, id):
             self.id = id
 
-    class Permission(object):
+    class Permission:
         pass
 
     @App.path(model=Model, path='{id}',
@@ -379,11 +378,11 @@ def test_jwt_identity_policy_errors():
     class App(morepath.App):
         pass
 
-    class Model(object):
+    class Model:
         def __init__(self, id):
             self.id = id
 
-    class Permission(object):
+    class Permission:
         pass
 
     @App.path(model=Model, path='{id}',
@@ -400,7 +399,7 @@ def test_jwt_identity_policy_errors():
         return "Model: %s" % self.id
 
     settings = {
-        'master_secret': u'sëcret',
+        'master_secret': 'sëcret',
         'leeway': None
     }
 
@@ -459,7 +458,7 @@ def test_jwt_remember():
 
     @App.path(path='{id}',
               variables=lambda model: {'id': model.id})
-    class Model(object):
+    class Model:
         def __init__(self, id):
             self.id = id
 
@@ -497,7 +496,7 @@ def test_jwt_forget():
         pass
 
     @App.path(path='{id}')
-    class Model(object):
+    class Model:
         def __init__(self, id):
             self.id = id
 

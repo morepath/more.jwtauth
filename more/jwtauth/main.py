@@ -61,7 +61,6 @@ In the later case the algorithm must be an EC*, PS* or RS* version.
 
 from calendar import timegm
 from datetime import datetime, timedelta
-import sys
 
 import jwt
 from morepath import Identity, NO_IDENTITY
@@ -72,10 +71,8 @@ from . import (
 )
 from .utils import handler
 
-PY3 = sys.version_info[0] == 3
 
-
-class JWTIdentityPolicy(object):
+class JWTIdentityPolicy:
     """Morepath Identity Policy implementing JWT Access Auth.
 
     This class provides an IdentityPolicy implementation based on
@@ -108,7 +105,7 @@ class JWTIdentityPolicy(object):
         if public_key is not None:
             _public_key = public_key
         if public_key_file is not None:
-            with open(public_key_file, 'r') as key_pub_file:
+            with open(public_key_file) as key_pub_file:
                 _public_key = key_pub_file.read()
         self.public_key = _public_key
 
@@ -116,7 +113,7 @@ class JWTIdentityPolicy(object):
         if private_key is not None:
             _private_key = private_key
         if private_key_file is not None:
-            with open(private_key_file, 'r') as key_priv_file:
+            with open(private_key_file) as key_priv_file:
                 _private_key = key_priv_file.read()
         self.private_key = _private_key
 
@@ -192,8 +189,10 @@ class JWTIdentityPolicy(object):
         userid = claims.pop('userid')
         claims_set = self.create_claims_set(request, userid, claims)
         token = self.encode_jwt(claims_set)
-        response.headers['Authorization'] = '%s %s' % (self.auth_header_prefix,
-                                                       token)
+        response.headers['Authorization'] = '{} {}'.format(
+            self.auth_header_prefix,
+            token,
+        )
 
     def forget(self, response, request):
         """Forget identity on response.
@@ -291,10 +290,11 @@ class JWTIdentityPolicy(object):
         :param claims_set: set of claims, which will be included in
             the created token.
         """
-        token = jwt.encode(claims_set, self.private_key, self.algorithm)
-
-        if PY3:
-            token = token.decode(encoding='UTF-8')
+        token = jwt.encode(
+            claims_set,
+            self.private_key,
+            self.algorithm,
+        ).decode(encoding='UTF-8')
 
         return token
 
@@ -342,7 +342,7 @@ class JWTIdentityPolicy(object):
         """
         try:
             authorization = request.authorization
-        except ValueError:
+        except ValueError:   # pragma: no cover
             return None
         if authorization is None:
             return None

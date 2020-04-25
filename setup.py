@@ -1,10 +1,8 @@
-import io
-
 from setuptools import find_packages, setup
 
 long_description = (
-    io.open('README.rst', encoding='utf-8').read() + '\n\n' +
-    io.open('CHANGES.rst', encoding='utf-8').read())
+    open('README.rst', encoding='utf-8').read() + '\n\n'
+    + open('CHANGES.rst', encoding='utf-8').read())
 
 setup(
     name='more.jwtauth',
@@ -26,11 +24,12 @@ setup(
         "Environment :: Web Environment",
         "Topic :: Software Development :: Libraries :: Application Frameworks",
         "Topic :: Internet :: WWW/HTTP :: WSGI",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
-        'Development Status :: 5 - Production/Stable'
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: Implementation :: PyPy",
+        "Development Status :: 5 - Production/Stable",
     ],
     install_requires=[
         'morepath >= 0.19',
