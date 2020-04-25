@@ -66,8 +66,10 @@ import jwt
 from morepath import Identity, NO_IDENTITY
 
 from . import (
-    InvalidTokenError, DecodeError, ExpiredSignatureError,
-    MissingRequiredClaimError
+    InvalidTokenError,
+    DecodeError,
+    ExpiredSignatureError,
+    MissingRequiredClaimError,
 )
 from .utils import handler
 
@@ -89,7 +91,7 @@ class JWTIdentityPolicy:
         private_key_file=None,
         public_key=None,
         public_key_file=None,
-        algorithm='HS256',
+        algorithm="HS256",
         expiration_delta=timedelta(minutes=30),
         leeway=0,
         allow_refresh=False,
@@ -97,8 +99,8 @@ class JWTIdentityPolicy:
         refresh_nonce_handler=None,
         verify_expiration_on_refresh=False,
         issuer=None,
-        auth_header_prefix='JWT',
-        userid_claim='sub'
+        auth_header_prefix="JWT",
+        userid_claim="sub",
     ):
         """Initiate the JWTIdentityPolicy with the given settings."""
         _public_key = master_secret
@@ -186,12 +188,11 @@ class JWTIdentityPolicy:
         :type identity: :class:`morepath.Identity`
         """
         claims = identity.as_dict()
-        userid = claims.pop('userid')
+        userid = claims.pop("userid")
         claims_set = self.create_claims_set(request, userid, claims)
         token = self.encode_jwt(claims_set)
-        response.headers['Authorization'] = '{} {}'.format(
-            self.auth_header_prefix,
-            token,
+        response.headers["Authorization"] = "{} {}".format(
+            self.auth_header_prefix, token,
         )
 
     def forget(self, response, request):
@@ -226,7 +227,7 @@ class JWTIdentityPolicy:
             be checked.
         """
         options = {
-            'verify_exp': verify_expiration,
+            "verify_exp": verify_expiration,
         }
         return jwt.decode(
             token,
@@ -234,7 +235,7 @@ class JWTIdentityPolicy:
             algorithms=[self.algorithm],
             options=options,
             leeway=self.leeway,
-            issuer=self.issuer
+            issuer=self.issuer,
         )
 
     def create_claims_set(self, request, userid, extra_claims=None):
@@ -265,15 +266,16 @@ class JWTIdentityPolicy:
         claims_set = {self.userid_claim: userid}
         now = timegm(datetime.utcnow().utctimetuple())
         if self.expiration_delta is not None:
-            claims_set['exp'] = now + self.expiration_delta
+            claims_set["exp"] = now + self.expiration_delta
         if self.issuer is not None:
-            claims_set['iss'] = self.issuer
+            claims_set["iss"] = self.issuer
         if self.allow_refresh:
             if self.refresh_delta is not None:
-                claims_set['refresh_until'] = now + self.refresh_delta
+                claims_set["refresh_until"] = now + self.refresh_delta
             if self.refresh_nonce_handler is not None:
-                claims_set['nonce'] = self.refresh_nonce_handler(request,
-                                                                 userid)
+                claims_set["nonce"] = self.refresh_nonce_handler(
+                    request, userid
+                )
         if extra_claims is not None:
             claims_set.update(extra_claims)
         return claims_set
@@ -291,10 +293,8 @@ class JWTIdentityPolicy:
             the created token.
         """
         token = jwt.encode(
-            claims_set,
-            self.private_key,
-            self.algorithm,
-        ).decode(encoding='UTF-8')
+            claims_set, self.private_key, self.algorithm,
+        ).decode(encoding="UTF-8")
 
         return token
 
@@ -320,8 +320,15 @@ class JWTIdentityPolicy:
         token.
         """
         reserved_claims = (
-            self.userid_claim, "iss", "aud", "exp", "nbf", "iat", "jti",
-            "refresh_until", "nonce"
+            self.userid_claim,
+            "iss",
+            "aud",
+            "exp",
+            "nbf",
+            "iat",
+            "jti",
+            "refresh_until",
+            "nonce",
         )
         extra_claims = {}
         for claim in claims_set:
@@ -342,7 +349,7 @@ class JWTIdentityPolicy:
         """
         try:
             authorization = request.authorization
-        except ValueError:   # pragma: no cover
+        except ValueError:  # pragma: no cover
             return None
         if authorization is None:
             return None
@@ -365,11 +372,11 @@ class JWTIdentityPolicy:
             MissingRequiredClaimError
         """
         if not self.allow_refresh:
-            raise InvalidTokenError('Token refresh is disabled')
+            raise InvalidTokenError("Token refresh is disabled")
 
         token = self.get_jwt(request)
         if token is None:
-            raise InvalidTokenError('Token not found')
+            raise InvalidTokenError("Token not found")
 
         try:
             claims_set = self.decode_jwt(
@@ -378,27 +385,29 @@ class JWTIdentityPolicy:
 
         # reraise the exceptions to change the error messages
         except DecodeError:
-            raise DecodeError('Token could not be decoded')
+            raise DecodeError("Token could not be decoded")
         except ExpiredSignatureError:
-            raise ExpiredSignatureError('Token has expired')
+            raise ExpiredSignatureError("Token has expired")
 
         userid = self.get_userid(claims_set)
         if userid is None:
             raise MissingRequiredClaimError(self.userid_claim)
 
         if self.refresh_nonce_handler is not None:
-            if 'nonce' not in claims_set:
-                raise MissingRequiredClaimError('nonce')
-            if self.refresh_nonce_handler(request,
-                                          userid) != claims_set['nonce']:
-                raise InvalidTokenError('Refresh nonce is not valid')
+            if "nonce" not in claims_set:
+                raise MissingRequiredClaimError("nonce")
+            if (
+                self.refresh_nonce_handler(request, userid)
+                != claims_set["nonce"]
+            ):
+                raise InvalidTokenError("Refresh nonce is not valid")
 
         if self.refresh_delta is not None:
-            if 'refresh_until' not in claims_set:
-                raise MissingRequiredClaimError('refresh_until')
+            if "refresh_until" not in claims_set:
+                raise MissingRequiredClaimError("refresh_until")
             now = timegm(datetime.utcnow().utctimetuple())
-            refresh_until = int(claims_set['refresh_until'])
+            refresh_until = int(claims_set["refresh_until"])
             if refresh_until < (now - self.leeway):
-                raise ExpiredSignatureError('Refresh nonce has expired')
+                raise ExpiredSignatureError("Refresh nonce has expired")
 
         return userid
