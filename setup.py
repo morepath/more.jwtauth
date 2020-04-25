@@ -33,7 +33,7 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
         "Development Status :: 5 - Production/Stable",
     ],
-    install_requires=["morepath >= 0.19", "PyJWT == 1.7.1",],
+    install_requires=["morepath >= 0.19", "PyJWT == 1.7.1"],
     extras_require=dict(
         crypto=["cryptography == 2.9.2"],
         test=[
@@ -41,7 +41,7 @@ setup(
             "pytest-remove-stale-bytecode",
             "WebTest >= 2.0.14",
         ],
-        pep8=["flake8", "black",],
-        coverage=["pytest-cov",],
+        pep8=["flake8", "black"],
+        coverage=["pytest-cov"],
     ),
 )
