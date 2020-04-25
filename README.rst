@@ -512,6 +512,16 @@ For upgrading the requirements just run the command again.
 
    The following commands work only if you have the virtualenv activated.
 
+Install pre-commit hook for Black integration
+---------------------------------------------
+
+We're using Black_ for formatting the code and it's recommended to
+install the `pre-commit hook`_ for Black integration before committing::
+
+  $ pre-commit install
+
+.. _`pre-commit hook`: https://black.readthedocs.io/en/stable/version_control_integration.html
+
 Running the tests
 -----------------
 
@@ -533,7 +543,19 @@ information.
 
 .. _`py.test`: http://pytest.org/latest/
 
-Various checking tools
+Black
+￼-----
+￼
+￼To format the code with the `Black Code Formatter`_ run in the root directory::
+￼
+￼  $ black morepath
+￼
+￼Black has also integration_ for the most popular editors.
+￼
+￼.. _`Black Code Formatter`: https://black.readthedocs.io
+￼.. _integration: https://black.readthedocs.io/en/stable/editor_integration.html
+￼
+￼Various checking tools
 ----------------------
 
 flake8_ is a tool that can do various checks for common Python
