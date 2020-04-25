@@ -11,7 +11,11 @@ __pycache__/
 /env/
 
 # Unit test / coverage reports
-.cache/
-/.coverage
-/htmlcov
-/.tox
+.cache
+.pytest_cache
+.coverage
+htmlcov
+.tox
+
+# Sphinx documentation
+/doc/build/
