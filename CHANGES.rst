@@ -4,6 +4,14 @@ CHANGES
 0.12 (unreleased)
 -----------------
 
+- **Removed**: Removed support for Python 2 and Python 3.4.
+  
+  You have to upgrade to Python 3 if you want to use this version.
+
+- Added support for Python 3.7 and 3.8 and PyPy 3.6.
+
+- Make Python 3.7 the default testing environment.
+
 - Upgrade PyJWT to version 1.7.1 and cryptography to version 2.9.2.
 
 

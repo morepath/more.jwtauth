@@ -1,26 +1,36 @@
 language: python
 
+python:
+    - "3.5"
+    - "3.6"
+    - "3.7"
+    - "3.8"
+    - "pypy3.6-7.1.1"
 matrix:
   include:
-    - python: 2.7
-      env: TOXENV=py27-nocrypto
-    - python: 3.4
-      env: TOXENV=py34-nocrypto
     - python: 3.5
       env: TOXENV=py35-nocrypto
     - python: 3.6
       env: TOXENV=py36-nocrypto
-    - python: 2.7
-      env: TOXENV=py27-crypto
-    - python: 3.4
-      env: TOXENV=py34-crypto
+    - python: 3.7
+      env: TOXENV=py37-nocrypto
+    - python: 3.8
+      env: TOXENV=py38-nocrypto
+    - python: pypy3.6-7.1.1
+      env: TOXENV=pypy3-nocrypto
     - python: 3.5
       env: TOXENV=py35-crypto
     - python: 3.6
       env: TOXENV=py36-crypto
-    - python: 3.5
+    - python: 3.7
+      env: TOXENV=py37-crypto
+    - python: 3.8
+      env: TOXENV=py38-crypto
+    - python: pypy3.6-7.1.1
+      env: TOXENV=pypy3-crypto
+    - python: 3.7
       env: TOXENV=pep8
-    - python: 3.5
+    - python: 3.7
       env: TOXENV=coverage
 
 before_install:
@@ -28,4 +38,4 @@ before_install:
 install:
     - pip install tox
 script:
-    - tox -e $TOXENV
+    - tox -s false -e $TOXENV

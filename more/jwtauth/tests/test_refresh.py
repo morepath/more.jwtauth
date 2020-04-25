@@ -50,7 +50,7 @@ def test_refresh_token():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.identity_policy()
@@ -122,7 +122,7 @@ def test_refresh_nonce_handler_set_by_decorator():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.identity_policy()
@@ -197,7 +197,7 @@ def test_refresh_token_with_extra_claims():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.identity_policy()
@@ -289,7 +289,7 @@ def test_refresh_delta_expired():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.path(model=Refresh, path='refresh')
@@ -338,7 +338,7 @@ def test_refresh_not_allowed():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.path(model=Refresh, path='refresh')
@@ -387,7 +387,7 @@ def test_refresh_delta_expired_but_with_leeway():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.identity_policy()
@@ -415,7 +415,7 @@ def test_refresh_delta_expired_but_with_leeway():
     refresh_nonce_handler = 'more.jwtauth.tests.handler.refresh_nonce_handler'
     settings = {
         'master_secret': 'secret',
-        'leeway':  timedelta(seconds=3),
+        'leeway': timedelta(seconds=3),
         'allow_refresh': True,
         'refresh_delta': -2,
         'refresh_nonce_handler': refresh_nonce_handler
@@ -457,7 +457,7 @@ def test_expiration_delta_expired_with_verify_expiration_on_refresh():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.path(model=Refresh, path='refresh')
@@ -511,7 +511,7 @@ def test_expiration_delta_expired_without_verify_expiration_on_refresh():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.identity_policy()
@@ -542,7 +542,7 @@ def test_expiration_delta_expired_without_verify_expiration_on_refresh():
     settings = {
         'master_secret': 'secret',
         'expiration_delta': expiration_delta,
-        'leeway':  timedelta(seconds=3),
+        'leeway': timedelta(seconds=3),
         'allow_refresh': True,
         'refresh_delta': refresh_delta,
         'refresh_nonce_handler': refresh_nonce_handler
@@ -585,7 +585,7 @@ def test_refresh_without_refresh_nonce_handler_setting():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.identity_policy()
@@ -651,7 +651,7 @@ def test_refresh_without_token():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.path(model=Refresh, path='refresh')
@@ -685,7 +685,7 @@ def test_refresh_with_invalid_token():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.path(model=Refresh, path='refresh')
@@ -722,7 +722,7 @@ def test_refresh_with_invalid_refresh_nonce():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.path(model=Refresh, path='refresh')
@@ -770,7 +770,7 @@ def test_refresh_with_missing_userid_claim():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.path(model=Refresh, path='refresh')
@@ -817,7 +817,7 @@ def test_refresh_with_missing_refresh_until_claim():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.path(model=Refresh, path='refresh')
@@ -862,7 +862,7 @@ def test_refresh_with_missing_nonce_claim():
     class App(morepath.App):
         pass
 
-    class Refresh(object):
+    class Refresh:
         pass
 
     @App.path(model=Refresh, path='refresh')
