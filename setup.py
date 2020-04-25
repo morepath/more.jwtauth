@@ -1,20 +1,22 @@
 from setuptools import find_packages, setup
 
 long_description = (
-    open('README.rst', encoding='utf-8').read() + '\n\n'
-    + open('CHANGES.rst', encoding='utf-8').read())
+    open("README.rst", encoding="utf-8").read()
+    + "\n\n"
+    + open("CHANGES.rst", encoding="utf-8").read()
+)
 
 setup(
-    name='more.jwtauth',
-    version='0.12.dev0',
+    name="more.jwtauth",
+    version="0.12.dev0",
     description="JWT Access Auth Identity Policy for Morepath",
     long_description=long_description,
     author="Morepath developers",
     author_email="morepath@googlegroups.com",
-    keywords='morepath JWT identity authentication',
+    keywords="morepath JWT identity authentication",
     license="BSD",
     url="https://github.com/morepath/more.jwtauth",
-    namespace_packages=['more'],
+    namespace_packages=["more"],
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
@@ -31,23 +33,15 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
         "Development Status :: 5 - Production/Stable",
     ],
-    install_requires=[
-        'morepath >= 0.19',
-        'PyJWT == 1.7.1',
-    ],
+    install_requires=["morepath >= 0.19", "PyJWT == 1.7.1",],
     extras_require=dict(
-        crypto=['cryptography == 2.9.2'],
+        crypto=["cryptography == 2.9.2"],
         test=[
-            'pytest >= 2.9.1',
-            'pytest-remove-stale-bytecode',
-            'WebTest >= 2.0.14',
+            "pytest >= 2.9.1",
+            "pytest-remove-stale-bytecode",
+            "WebTest >= 2.0.14",
         ],
-        pep8=[
-            'flake8',
-            'black',
-        ],
-        coverage=[
-            'pytest-cov',
-        ],
+        pep8=["flake8", "black",],
+        coverage=["pytest-cov",],
     ),
 )

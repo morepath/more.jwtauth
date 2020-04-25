@@ -1,2 +1,2 @@
 def refresh_nonce_handler(request, userid):
-    return '__' + userid + '__'
+    return "__" + userid + "__"
