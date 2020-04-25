@@ -44,7 +44,7 @@ setup(
         ],
         pep8=[
             'flake8',
-            'pep8-naming',
+            'black',
         ],
         coverage=[
             'pytest-cov',

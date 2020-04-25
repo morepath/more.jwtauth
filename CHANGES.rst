@@ -14,6 +14,8 @@ CHANGES
 
 - Upgrade PyJWT to version 1.7.1 and cryptography to version 2.9.2.
 
+- Add integration for the Black code formatter.
+
 
 0.11 (2018-01-18)
 -----------------
