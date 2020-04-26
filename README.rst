@@ -544,16 +544,16 @@ information.
 .. _`py.test`: http://pytest.org/latest/
 
 Black
-￼-----
+-----
 ￼
 ￼To format the code with the `Black Code Formatter`_ run in the root directory::
 ￼
 ￼  $ black morepath
 ￼
-￼Black has also integration_ for the most popular editors.
+￼Black has also `integration`_ for the most popular editors.
 ￼
 ￼.. _`Black Code Formatter`: https://black.readthedocs.io
-￼.. _integration: https://black.readthedocs.io/en/stable/editor_integration.html
+￼.. _`integration`: https://black.readthedocs.io/en/stable/editor_integration.html
 ￼
 ￼Various checking tools
 ----------------------
