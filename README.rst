@@ -548,7 +548,7 @@ Black
 ￼
 ￼To format the code with the `Black Code Formatter`_ run in the root directory::
 ￼
-￼  $ black morepath
+￼  $ black .
 ￼
 ￼Black has also `integration`_ for the most popular editors.
 ￼
