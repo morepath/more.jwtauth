@@ -192,7 +192,8 @@ class JWTIdentityPolicy:
         claims_set = self.create_claims_set(request, userid, claims)
         token = self.encode_jwt(claims_set)
         response.headers["Authorization"] = "{} {}".format(
-            self.auth_header_prefix, token,
+            self.auth_header_prefix,
+            token,
         )
 
     def forget(self, response, request):
@@ -293,7 +294,9 @@ class JWTIdentityPolicy:
             the created token.
         """
         token = jwt.encode(
-            claims_set, self.private_key, self.algorithm,
+            claims_set,
+            self.private_key,
+            self.algorithm,
         ).decode(encoding="UTF-8")
 
         return token
