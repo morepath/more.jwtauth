@@ -8,6 +8,10 @@ CHANGES
 
 - Drop support for Python 3.5.
 
+- Add support for Python 3.9.
+
+- Use GitHub Actions for CI.
+
 
 0.12 (2020-04-26)
 -----------------

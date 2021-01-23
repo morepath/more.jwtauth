@@ -1,3 +1,17 @@
+.. image:: https://github.com/morepath/more.jwtauth/workflows/CI/badge.svg?branch=master
+   :target: https://github.com/morepath/more.jwtauth/actions?workflow=CI
+   :alt: CI Status
+
+.. image:: https://coveralls.io/repos/github/morepath/more.jwtauth/badge.svg?branch=master
+    :target: https://coveralls.io/github/morepath/more.jwtauth?branch=master
+
+.. image:: https://img.shields.io/pypi/v/more.jwtauth.svg
+  :target: https://pypi.org/project/more.jwtauth/
+
+.. image:: https://img.shields.io/pypi/pyversions/more.jwtauth.svg
+  :target: https://pypi.org/project/more.jwtauth/
+
+
 more.jwtauth: JWT Authentication integration for Morepath
 =========================================================
 
@@ -45,7 +59,7 @@ external password validation.
 Requirements
 ------------
 
--  Python (3.4, 3.5, 3.6, 3.7, 3.8)
+-  Python (3.4, 3.5, 3.6, 3.7, 3.8, 3.9)
 -  morepath (>= 0.19)
 -  PyJWT (1.7.1)
 -  optional: cryptography (2.9.2)

@@ -6,3 +6,5 @@ CREDITS
 * Stefano Taschini
 
 * Izhar Firdaus
+
+* Jürgen Gmach (CI)

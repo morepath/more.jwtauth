@@ -29,6 +29,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Development Status :: 5 - Production/Stable",
     ],
@@ -40,7 +41,6 @@ setup(
             "pytest-remove-stale-bytecode",
             "WebTest >= 2.0.14",
         ],
-        pep8=["flake8", "black"],
         coverage=["pytest-cov"],
     ),
 )
