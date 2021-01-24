@@ -2,9 +2,6 @@
    :target: https://github.com/morepath/more.jwtauth/actions?workflow=CI
    :alt: CI Status
 
-.. image:: https://coveralls.io/repos/github/morepath/more.jwtauth/badge.svg?branch=master
-    :target: https://coveralls.io/github/morepath/more.jwtauth?branch=master
-
 .. image:: https://img.shields.io/pypi/v/more.jwtauth.svg
   :target: https://pypi.org/project/more.jwtauth/
 
