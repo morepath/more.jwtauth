@@ -33,7 +33,7 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
         "Development Status :: 5 - Production/Stable",
     ],
-    install_requires=["morepath >= 0.19", "PyJWT == 1.7.1"],
+    install_requires=["morepath >= 0.19", "PyJWT == 2.4.0"],
     extras_require=dict(
         crypto=["cryptography == 2.9.2"],
         test=[
