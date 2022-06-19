@@ -4,7 +4,9 @@ CHANGES
 0.13 (unreleased)
 -----------------
 
-- Fix Flake8.
+- Remove obsolete decoding of encoded token.
+
+- Upgrade PyJWT and Cryptography dependencies.
 
 - Drop support for Python 3.5.
 
@@ -69,7 +71,7 @@ CHANGES
   For details see README.rst.
 
 - **Removed:** The ``verify_expiration`` setting has been removed as it was
-  mainly for custom handling of token refreshing, which is now obsolente.
+  mainly for custom handling of token refreshing, which is now obsolete.
 
 - Pass algorithm explicit to ``jwt.decode()`` to avoid some vulnerabilities.
   For details see the blog post by Tim McLean about some
