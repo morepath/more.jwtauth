@@ -56,10 +56,10 @@ external password validation.
 Requirements
 ------------
 
--  Python (3.4, 3.5, 3.6, 3.7, 3.8, 3.9)
+-  Python (3.6, 3.7, 3.8, 3.9)
 -  morepath (>= 0.19)
--  PyJWT (1.7.1)
--  optional: cryptography (2.9.2)
+-  PyJWT (2.4.0)
+-  optional: cryptography (>= 3.3.2)
 
 .. Note::
    If you want to use another algorithm than HMAC (HS*), you need to install
@@ -556,17 +556,17 @@ information.
 
 Black
 -----
-￼
-￼To format the code with the `Black Code Formatter`_ run in the root directory::
-￼
-￼  $ black .
-￼
-￼Black has also `integration`_ for the most popular editors.
-￼
-￼.. _`Black Code Formatter`: https://black.readthedocs.io
-￼.. _`integration`: https://black.readthedocs.io/en/stable/editor_integration.html
-￼
-￼Various checking tools
+
+To format the code with the `Black Code Formatter`_ run in the root directory::
+
+  $ black .
+
+Black has also `integration`_ for the most popular editors.
+
+.. _`Black Code Formatter`: https://black.readthedocs.io
+.. _`integration`: https://black.readthedocs.io/en/stable/editor_integration.html
+
+Various checking tools
 ----------------------
 
 flake8_ is a tool that can do various checks for common Python
