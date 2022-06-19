@@ -1,7 +1,7 @@
 CHANGES
 =======
 
-0.13 (unreleased)
+0.13 (2022-06-19)
 -----------------
 
 - Remove obsolete decoding of encoded token.
