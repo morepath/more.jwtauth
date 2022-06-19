@@ -297,7 +297,7 @@ class JWTIdentityPolicy:
             claims_set,
             self.private_key,
             self.algorithm,
-        ).decode(encoding="UTF-8")
+        )
 
         return token
 
