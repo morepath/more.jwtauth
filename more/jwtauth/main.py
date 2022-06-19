@@ -63,12 +63,12 @@ from calendar import timegm
 from datetime import datetime, timedelta
 
 import jwt
-from morepath import Identity, NO_IDENTITY
+from morepath import NO_IDENTITY, Identity
 
 from . import (
-    InvalidTokenError,
     DecodeError,
     ExpiredSignatureError,
+    InvalidTokenError,
     MissingRequiredClaimError,
 )
 from .utils import handler

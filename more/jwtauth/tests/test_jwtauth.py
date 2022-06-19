@@ -1,16 +1,16 @@
 from datetime import timedelta
 
-import pytest
-
 import morepath
-from more.jwtauth import (
-    JWTIdentityPolicy,
-    ExpiredSignatureError,
-    InvalidIssuerError,
-)
-from morepath import Identity, NO_IDENTITY, Response
+import pytest
+from morepath import NO_IDENTITY, Identity, Response
 from webob.exc import HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
+
+from more.jwtauth import (
+    ExpiredSignatureError,
+    InvalidIssuerError,
+    JWTIdentityPolicy,
+)
 
 
 def test_jwt_custom_settings():

@@ -1,11 +1,11 @@
 # flake8: noqa
 
 from jwt import (
-    InvalidTokenError,
     DecodeError,
     ExpiredSignatureError,
-    MissingRequiredClaimError,
     InvalidIssuerError,
+    InvalidTokenError,
+    MissingRequiredClaimError,
 )
 
 from .main import JWTIdentityPolicy

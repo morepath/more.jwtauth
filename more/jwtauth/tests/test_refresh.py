@@ -1,19 +1,20 @@
 from calendar import timegm
 from datetime import datetime, timedelta
 
-import pytest
 import morepath
+import pytest
 from morepath import Identity
+from webtest import TestApp as Client
+
 from more.jwtauth import (
-    JWTIdentityPolicy,
-    verify_refresh_request,
-    InvalidTokenError,
     DecodeError,
     ExpiredSignatureError,
+    InvalidTokenError,
+    JWTIdentityPolicy,
     MissingRequiredClaimError,
+    verify_refresh_request,
 )
 from more.jwtauth.utils import handler
-from webtest import TestApp as Client
 
 
 def test_handler():
