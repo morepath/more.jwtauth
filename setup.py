@@ -42,5 +42,11 @@ setup(
             "WebTest >= 2.0.14",
         ],
         coverage=["pytest-cov"],
+        lint=[
+            "black == 22.3.0",
+            "flake8 == 4.0.1",
+            "pyupgrade == 2.34.0",
+            "isort == 5.10.1",
+        ],
     ),
 )
