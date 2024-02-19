@@ -58,7 +58,6 @@ The library takes either a master_secret or private_key/public_key pair.
 In the later case the algorithm must be an EC*, PS* or RS* version.
 """
 
-
 from calendar import timegm
 from datetime import datetime, timedelta
 
