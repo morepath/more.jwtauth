@@ -39,7 +39,8 @@ setup(
         test=[
             "pytest >= 2.9.1",
             "pytest-remove-stale-bytecode",
-            "WebTest >= 2.0.14",
+            "webtest",
+            "pygments",
         ],
         coverage=["pytest-cov"],
         lint=[
