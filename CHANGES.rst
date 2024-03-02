@@ -4,7 +4,19 @@ CHANGES
 0.14 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Upgrade PyJWT and Cryptography dependencies.
+
+- Fix test_refresh.
+
+- **Removed**: Drop support for Python 3.6 and 3.7.
+
+- Add support for Python 3.10, 3.11 and 3.12.
+
+- Show full diffs in the test output.
+
+- Update pre-commit revs.
+
+- Adjust README.
 
 
 0.13 (2022-06-19)
