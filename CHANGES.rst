@@ -1,7 +1,7 @@
 CHANGES
 =======
 
-0.14 (unreleased)
+0.14 (2024-03-02)
 -----------------
 
 - Upgrade PyJWT and Cryptography dependencies.
