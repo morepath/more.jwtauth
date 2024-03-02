@@ -425,48 +425,50 @@ The JWT spec supports several algorithms for cryptographic signing.
 This library currently supports:
 
 HS256
-   HMAC using SHA-256 hash algorithm (default)
+  HMAC using SHA-256 hash algorithm (default)
 
 HS384
-   HMAC using SHA-384 hash algorithm
+  HMAC using SHA-384 hash algorithm
 
 HS512
    HMAC using SHA-512 hash algorithm
 
 ES256 [1]_
-   ECDSA signature algorithm using SHA-256 hash algorithm
+  ECDSA signature algorithm using SHA-256 hash algorithm
 
 ES384 [1]_
-   ECDSA signature algorithm using SHA-384 hash algorithm
+  ECDSA signature algorithm using SHA-384 hash algorithm
 
 ES512 [1]_
-   ECDSA signature algorithm using SHA-512 hash algorithm
+  ECDSA signature algorithm using SHA-512 hash algorithm
 
 PS256 [1]_
-   RSASSA-PSS signature using SHA-256 and MGF1 padding with SHA-256
+  RSASSA-PSS signature using SHA-256 and MGF1 padding with SHA-256
 
 PS384 [1]_
-   RSASSA-PSS signature using SHA-384 and MGF1 padding with SHA-384
+  RSASSA-PSS signature using SHA-384 and MGF1 padding with SHA-384
 
 PS512 [1]_
-   RSASSA-PSS signature using SHA-512 and MGF1 padding with SHA-512
+  RSASSA-PSS signature using SHA-512 and MGF1 padding with SHA-512
 
 RS256 [1]_
-   RSASSA-PKCS1-v1_5 signature algorithm using SHA-256 hash algorithm
+  RSASSA-PKCS1-v1_5 signature algorithm using SHA-256 hash algorithm
 
 RS384 [1]_
-   RSASSA-PKCS1-v1_5 signature algorithm using SHA-384 hash algorithm
+  RSASSA-PKCS1-v1_5 signature algorithm using SHA-384 hash algorithm
 
 RS512 [1]_
-   RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
+  RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
 
 .. [1] The marked algorithms require more.jwtauth to be installed
-       with its ``crypto`` dependencies::
+  with its ``crypto`` dependencies::
 
-         $ pip install -U more.jwtauth[crypto]
+    .. code-block:: console
 
-       See Installation_ for details. In case of problems be sure
-       to have read the note in the Requirements_ section.
+        pip install -U more.jwtauth[crypto]
+
+    See Installation_ for details. In case of problems be sure
+    to have read the note in the Requirements_ section.
 
 
 Developing more.jwtauth
@@ -479,7 +481,7 @@ Clone more.jwtauth from github::
 
 .. code-block:: console
 
-  $ git clone git@github.com:morepath/more.jwtauth.git
+  git clone git@github.com:morepath/more.jwtauth.git
 
 If this doesn't work and you get an error 'Permission denied (publickey)',
 you need to upload your ssh public key to github_.
@@ -488,34 +490,34 @@ Then go to the more.jwtauth directory::
 
 .. code-block:: console
 
-  $ cd more.jwtauth
+  cd more.jwtauth
 
 Make sure you have virtualenv_ installed.
 
-Create a new virtualenv for Python 3 inside the more.jwtauth directory::
+Create a new virtualenv inside the more.jwtauth directory::
 
 .. code-block:: console
 
-  $ virtualenv -p python3 env/py3
+  python -m venv .venv
 
 Activate the virtualenv::
 
 .. code-block:: console
 
-  $ source env/py3/bin/activate
+  source .venv/bin/activate
 
-Make sure you have recent setuptools and pip installed::
+Inside the virtualenv make sure you have recent setuptools and pip installed::
 
 .. code-block:: console
 
-  $ pip install -U setuptools pip
+  pip install -U setuptools pip
 
 Install the various dependencies and development tools from
 develop_requirements.txt::
 
 .. code-block:: console
 
-  $ pip install -Ur develop_requirements.txt
+  pip install -Ur develop_requirements.txt
 
 For upgrading the requirements just run the command again.
 
@@ -529,37 +531,37 @@ Install pre-commit hook for Black integration
 We're using Black_ for formatting the code and it's recommended to
 install the `pre-commit hook`_ for Black integration before committing::
 
-  $ pre-commit install
+  pre-commit install
 
 .. _`pre-commit hook`: https://black.readthedocs.io/en/stable/version_control_integration.html
 
 Running the tests
 -----------------
 
-You can run the tests using `py.test`_::
+You can run the tests using `pytest`_::
 
 .. code-block:: console
 
-  $ py.test
+  pytest
 
 To generate test coverage information as HTML do::
 
 .. code-block:: console
 
-  $ py.test --cov --cov-report html
+  pytest --cov --cov-report html
 
 You can then point your web browser to the ``htmlcov/index.html`` file
 in the project directory and click on modules to see detailed coverage
 information.
 
-.. _`py.test`: http://pytest.org/latest/
+.. _`pytest`: http://pytest.org/latest/
 
 Black
 -----
 
 To format the code with the `Black Code Formatter`_ run in the root directory::
 
-  $ black .
+  black .
 
 Black has also `integration`_ for the most popular editors.
 
@@ -576,13 +578,13 @@ checking do::
 
 .. code-block:: console
 
-  $ flake8 more.jwtauth
+  flake8 more.jwtauth
 
 To also show cyclomatic complexity, use this command::
 
 .. code-block:: console
 
-  $ flake8 --max-complexity=10 more.jwtauth
+  flake8 --max-complexity=10 more.jwtauth
 
 Tox
 ---
@@ -603,21 +605,21 @@ To find out which test environments are defined for Morepath in tox.ini run::
 
 .. code-block:: console
 
-  $ tox -l
+  tox -l
 
 You can run all tox tests with::
 
 .. code-block:: console
 
-  $ tox
+  tox
 
 You can also specify a test environment to run e.g.::
 
 .. code-block:: console
 
-  $ tox -e py37
-  $ tox -e pep8
-  $ tox -e coverage
+  tox -e py37
+  tox -e pep8
+  tox -e coverage
 
 
 .. _Morepath: http://morepath.readthedocs.org
