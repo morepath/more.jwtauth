@@ -5,7 +5,7 @@ def verify_refresh_request(request):
     """
     Wrapper around JWTIdentityPolicy.verify_refresh which verify
     if the request to refresh the token is valid.
-    If valid it returns the userid which can be used to create to
+    If valid it returns the userid which can be used to
     create an updated identity with ``remember_identity``.
     Otherwise it raises an exception based on InvalidTokenError.
 

@@ -571,7 +571,9 @@ def test_expiration_delta_expired_without_verify_expiration_on_refresh():
     }
 
     authtype, token = r.headers["Authorization"].split(" ", 1)
-    claims_set_decoded = identity_policy.decode_jwt(token)
+    claims_set_decoded = identity_policy.decode_jwt(
+        token, verify_expiration=False
+    )
 
     assert identity_policy.get_userid(claims_set_decoded) == "user"
 

@@ -33,9 +33,9 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
         "Development Status :: 5 - Production/Stable",
     ],
-    install_requires=["morepath >= 0.19", "PyJWT == 2.4.0"],
+    install_requires=["morepath >= 0.19", "PyJWT == 2.8.0"],
     extras_require=dict(
-        crypto=["cryptography >= 3.3.2"],
+        crypto=["cryptography >= 3.4.0"],
         test=[
             "pytest >= 2.9.1",
             "pytest-remove-stale-bytecode",
