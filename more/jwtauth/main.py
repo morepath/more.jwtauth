@@ -59,7 +59,7 @@ In the later case the algorithm must be an EC*, PS* or RS* version.
 """
 
 from calendar import timegm
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import jwt
 from morepath import NO_IDENTITY, Identity
@@ -264,7 +264,7 @@ class JWTIdentityPolicy:
         :param extra_claims: dictionary, containing additional claims or None.
         """
         claims_set = {self.userid_claim: userid}
-        now = timegm(datetime.utcnow().utctimetuple())
+        now = timegm(datetime.now(timezone.utc).utctimetuple())
         if self.expiration_delta is not None:
             claims_set["exp"] = now + self.expiration_delta
         if self.issuer is not None:
@@ -407,7 +407,7 @@ class JWTIdentityPolicy:
         if self.refresh_delta is not None:
             if "refresh_until" not in claims_set:
                 raise MissingRequiredClaimError("refresh_until")
-            now = timegm(datetime.utcnow().utctimetuple())
+            now = timegm(datetime.now(timezone.utc).utctimetuple())
             refresh_until = int(claims_set["refresh_until"])
             if refresh_until < (now - self.leeway):
                 raise ExpiredSignatureError("Refresh nonce has expired")

@@ -1,5 +1,5 @@
 from calendar import timegm
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import morepath
 import pytest
@@ -45,7 +45,7 @@ def test_create_claims_with_refresh_until_and_nonce():
     userid = "user"
     claims_set = identity_policy.create_claims_set(None, userid)
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(timezone.utc).utctimetuple())
 
     assert claims_set["refresh_until"] >= now + 1
     assert claims_set["refresh_until"] <= now + 3
@@ -97,7 +97,7 @@ def test_refresh_token():
     settings = app.settings.jwtauth.__dict__.copy()
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(timezone.utc).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -173,7 +173,7 @@ def test_refresh_nonce_handler_set_by_decorator():
     settings = app.settings.jwtauth.__dict__.copy()
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(timezone.utc).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -248,7 +248,7 @@ def test_refresh_token_with_extra_claims():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(timezone.utc).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -318,7 +318,9 @@ def test_refresh_delta_expired():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    refresh_until = timegm((datetime.utcnow() + refresh_delta).utctimetuple())
+    refresh_until = timegm(
+        (datetime.now(timezone.utc) + refresh_delta).utctimetuple()
+    )
 
     claims_set = {
         "sub": "user",
@@ -367,7 +369,9 @@ def test_refresh_not_allowed():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    refresh_until = timegm((datetime.utcnow() + refresh_delta).utctimetuple())
+    refresh_until = timegm(
+        (datetime.now(timezone.utc) + refresh_delta).utctimetuple()
+    )
 
     claims_set = {
         "sub": "user",
@@ -428,7 +432,7 @@ def test_refresh_delta_expired_but_with_leeway():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(timezone.utc).utctimetuple())
 
     claims_set = {"sub": "user", "refresh_until": now - 2, "nonce": "__user__"}
 
@@ -483,8 +487,10 @@ def test_expiration_delta_expired_with_verify_expiration_on_refresh():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    exp = timegm((datetime.utcnow() + expiration_delta).utctimetuple())
-    refresh_until = timegm((datetime.utcnow() + refresh_delta).utctimetuple())
+    exp = timegm((datetime.now(timezone.utc) + expiration_delta).utctimetuple())
+    refresh_until = timegm(
+        (datetime.now(timezone.utc) + refresh_delta).utctimetuple()
+    )
 
     claims_set = {
         "sub": "user",
@@ -549,7 +555,7 @@ def test_expiration_delta_expired_without_verify_expiration_on_refresh():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(timezone.utc).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -617,7 +623,7 @@ def test_refresh_without_refresh_nonce_handler_setting():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(timezone.utc).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -742,7 +748,7 @@ def test_refresh_with_invalid_refresh_nonce():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(timezone.utc).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -790,7 +796,7 @@ def test_refresh_with_missing_userid_claim():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(timezone.utc).utctimetuple())
 
     claims_set = {"refresh_until": now + 3, "nonce": "__user__"}
 
@@ -876,7 +882,7 @@ def test_refresh_with_missing_nonce_claim():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(timezone.utc).utctimetuple())
 
     claims_set = {"sub": "user", "refresh_until": now + 3}
 
