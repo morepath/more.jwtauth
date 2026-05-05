@@ -24,7 +24,7 @@ jobs:
           - tox-env: "py314-crypto"
             python-version: "3.14"
           - tox-env: "pypy3-crypto"
-            python-version: "pypy-3.10"
+            python-version: "pypy-3.11"
           - tox-env: "coverage"
             python-version: "3.13"
           # without cryptography
@@ -39,7 +39,7 @@ jobs:
           - tox-env: "py314-nocrypto"
             python-version: "3.14"
           - tox-env: "pypy3-nocrypto"
-            python-version: "pypy-3.10"
+            python-version: "pypy-3.11"
           - tox-env: "lint"
             python-version: "3.13"
           - tox-env: "pre-commit"
