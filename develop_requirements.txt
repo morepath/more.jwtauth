@@ -1,7 +1,7 @@
 # development
 -e '.[crypto,test,coverage,lint]'
 pre-commit
-tox >= 2.4.1
+tox >= 4.21.1
 
 # releaser
 zest.releaser[recommended]

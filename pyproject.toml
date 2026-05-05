@@ -51,13 +51,13 @@ where = ["src"]
 readme = {file = ["README.rst", "CHANGES.rst"]}
 
 [tool.pytest]
-testpaths = ["more"]
+testpaths = ["src"]
 addopts = ["-vv"]
 pythonpath = ["."]
 env = ["RUN_ENV=test"]
 
 [tool.coverage.run]
-source = ["more.jwtauth"]
+source = ["src"]
 
 [tool.coverage.report]
 show_missing = true
@@ -81,27 +81,27 @@ extras = ["test"]
 deps = [
     { replace = "if", condition = "factor.crypto", then = ["cryptography"], extend = true },
 ]
-commands = [["pytest", "{posargs:more/jwtauth}"]]
+commands = [["pytest", "."]]
 
 [tool.tox.env.coverage]
-base_python = ["python3.11"]
+base_python = ["python3.13"]
 extras = ["test", "coverage"]
 deps = ["cryptography"]
 commands = [
-    ["pytest", "--cov", "--cov-fail-under=100", "{posargs:more/jwtauth}"],
+    ["pytest", "--cov", "--cov-fail-under=100", "."],
 ]
 
 [tool.tox.env.lint]
-base_python = ["python3.11"]
+base_python = ["python3.13"]
 extras = ["lint"]
 commands = [
-    ["flake8", "more/jwtauth"],
+    ["flake8", "src"],
     ["black", "--check", "--diff", "--color", "."],
     ["isort", "--diff", "."],
 ]
 
 [tool.tox.env.pre-commit]
-base_python = ["python3.11"]
+base_python = ["python3.13"]
 package = "skip"
 deps = ["pre-commit"]
 commands = [
