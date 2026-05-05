@@ -1,7 +1,7 @@
 CHANGES
 =======
 
-0.16 (unreleased)
+0.16 (2026-05-05)
 -----------------
 
 - Update paths for src-layout.

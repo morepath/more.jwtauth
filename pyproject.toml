@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name="more.jwtauth"
-version = "0.16.dev0"
+version = "0.16"
 description="JWT Access Auth Identity Policy for Morepath"
 dynamic = ["readme"]
 license = "BSD-3-Clause"
