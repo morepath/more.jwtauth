@@ -44,8 +44,8 @@ test = ["pytest >= 8", "WebTest >= 2.0.14", "pytest-env"]
 coverage = ["pytest-cov"]
 lint = ["black", "flake8", "isort", "pyupgrade"]
 
-[tool.setuptools]
-packages = ["more.jwtauth"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.rst", "CHANGES.rst"]}
