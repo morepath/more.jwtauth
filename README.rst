@@ -486,31 +486,23 @@ Clone more.jwtauth from github::
 If this doesn't work and you get an error 'Permission denied (publickey)',
 you need to upload your ssh public key to github_.
 
-Then go to the more.jwtauth directory::
+Then go to the repository directory::
 
 .. code-block:: console
 
   cd more.jwtauth
 
-Make sure you have virtualenv_ installed.
-
 Create a new virtualenv inside the more.jwtauth directory::
 
 .. code-block:: console
 
-  python -m venv .venv
+  python -m venv --upgrade-deps .venv
 
 Activate the virtualenv::
 
 .. code-block:: console
 
   source .venv/bin/activate
-
-Inside the virtualenv make sure you have recent setuptools and pip installed::
-
-.. code-block:: console
-
-  pip install -U setuptools pip
 
 Install the various dependencies and development tools from
 develop_requirements.txt::
