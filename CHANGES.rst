@@ -1,7 +1,7 @@
 CHANGES
 =======
 
-0.15 (unreleased)
+0.15 (2026-05-05)
 -----------------
 
 - Switch to src-layout.
