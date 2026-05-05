@@ -4,7 +4,22 @@ CHANGES
 0.15 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Switch to src-layout.
+
+- Replace deprecated ``datetime.utcnow()`` with ``datetime.now(timezone.utc)``.
+
+- Fix corrupted EC key in the test suite.
+
+- Adjust documentation for development installation.
+
+- Move to pyproject.toml project configuration and drop setup.py,
+  setup.cfg and tox.ini.
+
+- Switch to native namespace packages.
+
+- Add support for Python 3.13 and 3.14.
+
+- Update pre-commit revs.
 
 
 0.14 (2024-03-02)

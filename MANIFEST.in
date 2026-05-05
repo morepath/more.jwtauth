@@ -1,4 +1,3 @@
-include *.txt *.rst *.cfg *.py *.ini *.yaml
-exclude .installed.cfg .mr.developer.cfg
-recursive-include more *.py
-recursive-include more/jwtauth/tests/keys *
+include *.txt *.rst *.yaml .flake8
+recursive-include src *.py
+recursive-include src/more/jwtauth/tests/keys *
