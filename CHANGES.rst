@@ -4,7 +4,11 @@ CHANGES
 0.16 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Update paths for src-layout.
+
+- Adjust Tox version.
+
+- Upgrade to pypy-3.11.
 
 
 0.15 (2026-05-05)
