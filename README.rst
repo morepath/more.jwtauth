@@ -32,6 +32,14 @@ JWT validates the authenticity of the claimset using the signature.
 
 This plugin uses the `PyJWT library`_ from José Padilla for verifying JWTs.
 
+.. _Morepath: https://morepath.readthedocs.io
+.. _JSON Web Token draft:
+    http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html
+.. _Auth with JSON Web Tokens:
+    http://jpadilla.com/post/73791304724/auth-with-json-web-tokens
+.. _PyJWT library: http://github.com/progrium/pyjwt
+
+
 Introduction
 ------------
 
@@ -53,21 +61,6 @@ so JWT Access Authentication can be used by a stateless service e.g. with
 external password validation.
 
 
-Requirements
-------------
-
--  Python (3.6, 3.7, 3.8, 3.9)
--  morepath (>= 0.19)
--  PyJWT (2.4.0)
--  optional: cryptography (>= 3.3.2)
-
-.. Note::
-   If you want to use another algorithm than HMAC (HS*), you need to install
-   cryptography.
-   On some systems this can be a little tricky. Please follow the instructions
-   in https://cryptography.io/en/latest/installation.
-
-
 Installation
 ------------
 
@@ -75,6 +68,12 @@ You can use pip for installing more.jwtauth:
 
 * ``pip install -U more.jwtauth[crypto]`` - for installing with cryptography
 * ``pip install -U more.jwtauth`` - installing without cryptography
+
+.. Note::
+   If you want to use another algorithm than HMAC (HS*), you need to install
+   cryptography.
+   On some systems this can be a little tricky. Please follow the instructions
+   in https://cryptography.io/en/latest/installation.
 
 
 Usage
@@ -136,12 +135,12 @@ and can be accessed through the morepath.Identity object:
 
     @App.view(model=Login, request_method='POST')
     def login(self, request):
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
         # Here you get some extra user information.
-        email = request.POST['email']
-        role = request.POST['role']
+        email = request.POST.get('email')
+        role = request.POST.get('role')
 
         # Do the password validation.
         if not user_has_password(username, password):
@@ -481,7 +480,7 @@ Clone more.jwtauth from github::
 
 .. code-block:: console
 
-  git clone git@github.com:morepath/more.jwtauth.git
+  $ git clone git@github.com:morepath/more.jwtauth.git
 
 If this doesn't work and you get an error 'Permission denied (publickey)',
 you need to upload your ssh public key to github_.
@@ -490,26 +489,26 @@ Then go to the repository directory::
 
 .. code-block:: console
 
-  cd more.jwtauth
+  $ cd more.jwtauth
 
 Create a new virtualenv inside the more.jwtauth directory::
 
 .. code-block:: console
 
-  python -m venv --upgrade-deps .venv
+  $ python -m venv --upgrade-deps .venv
 
 Activate the virtualenv::
 
 .. code-block:: console
 
-  source .venv/bin/activate
+  $ source .venv/bin/activate
 
 Install the various dependencies and development tools from
 develop_requirements.txt::
 
 .. code-block:: console
 
-  pip install -Ur develop_requirements.txt
+  (.venv) $ pip install -Ur develop_requirements.txt
 
 For upgrading the requirements just run the command again.
 
@@ -517,15 +516,69 @@ For upgrading the requirements just run the command again.
 
    The following commands work only if you have the virtualenv activated.
 
-Install pre-commit hook for Black integration
----------------------------------------------
+.. _github: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
 
-We're using Black_ for formatting the code and it's recommended to
-install the `pre-commit hook`_ for Black integration before committing::
+Code quality checks
+-------------------
 
-  pre-commit install
+Ruff
+~~~~
 
-.. _`pre-commit hook`: https://black.readthedocs.io/en/stable/version_control_integration.html
+Morepath uses Ruff_ for linting, import sorting, and code formatting. Run
+the checks from the project directory with::
+
+.. code-block:: console
+
+  (.venv) $ ruff check .
+  (.venv) $ ruff format --check .
+
+To apply lint fixes and format the code, run::
+
+.. code-block:: console
+
+  (.venv) $ ruff check --fix .
+  (.venv) $ ruff format .
+
+Ruff uses the project settings in ``pyproject.toml``. The ``lint`` tox
+environment runs both checks.
+
+.. _Ruff: https://docs.astral.sh/ruff/
+
+Pre-commit hook
+~~~~~~~~~~~~~~~
+
+To run the checks automatically on staged Python files before each
+commit, enable the repository's optional Git hook once in your clone::
+
+.. code-block:: console
+
+  $ git config core.hooksPath .githooks
+
+The hook checks the staged contents without modifying files.
+First it checks for formatting issues and then for remaining linting issues.
+It looks for Ruff in ``.venv`` and then on ``PATH``.
+
+Because it checks staged files rather than the working directory,
+``ruff check --fix`` may not report or fix the staged errors if the working
+copy has changed.
+
+Stage the corrected files with ``git add`` before retrying.
+
+Set ``RUFF_PRE_COMMIT_VERBOSE=1`` when committing to print the full Ruff path
+and lint diagnostics for the staged files::
+
+.. code-block:: console
+
+  $ RUFF_PRE_COMMIT_VERBOSE=1 git commit
+
+If needed install Ruff with::
+
+.. code-block:: console
+
+  (.venv) $ pip install -e .[lint]
+
+Hooks are local conveniences and can be bypassed. CI continues to run the full
+project lint and formatting checks.
 
 Running the tests
 -----------------
@@ -534,97 +587,68 @@ You can run the tests using `pytest`_::
 
 .. code-block:: console
 
-  pytest
+  (.venv) $ pytest
 
 To generate test coverage information as HTML do::
 
 .. code-block:: console
 
-  pytest --cov --cov-report html
+  (.venv) $ pytest --cov --cov-report html
 
 You can then point your web browser to the ``htmlcov/index.html`` file
 in the project directory and click on modules to see detailed coverage
 information.
 
-.. _`pytest`: http://pytest.org/latest/
+.. _`pytest`: https://pytest.org
 
-Black
------
+Type checking
+-------------
 
-To format the code with the `Black Code Formatter`_ run in the root directory::
-
-  black .
-
-Black has also `integration`_ for the most popular editors.
-
-.. _`Black Code Formatter`: https://black.readthedocs.io
-.. _`integration`: https://black.readthedocs.io/en/stable/editor_integration.html
-
-Various checking tools
-----------------------
-
-flake8_ is a tool that can do various checks for common Python
-mistakes using pyflakes_, check for PEP8_ style compliance and
-can do `cyclomatic complexity`_ checking. To do pyflakes and pep8
-checking do::
+more.jwtauth uses mypy_ and pyright_ for type checking. Run either checker
+from the project directory::
 
 .. code-block:: console
 
-  flake8 more.jwtauth
+  (.venv) $ mypy
+  (.venv) $ pyright
 
-To also show cyclomatic complexity, use this command::
+Both checkers use the settings in ``pyproject.toml``.
 
-.. code-block:: console
-
-  flake8 --max-complexity=10 more.jwtauth
+.. _mypy: https://mypy.readthedocs.io/
+.. _pyright: https://microsoft.github.io/pyright/
 
 Tox
 ---
 
-With tox you can test Morepath under different Python environments.
+With tox you can test more.jwtauth under different Python environments.
 
-We have Travis continuous integration installed on Morepath's github
+We have gh-actions continuous integration installed on more.jwtauth's github
 repository and it runs the same tox tests after each checkin.
 
-First you should install all Python versions which you want to
-test. The versions which are not installed will be skipped. You should
-at least install Python 3.7 which is required by flake8, coverage and
-doctests.
+First you should install all Python versions which you want to test.
+The versions which are not installed will be skipped. You should at least
+install Python 3.14 which is required by coverage, lint, mypy and pyright.
 
 One tool you can use to install multiple versions of Python is pyenv_.
 
-To find out which test environments are defined for Morepath in tox.ini run::
+To find out which test environments are defined for more.jwtauth in pyproject.toml run::
 
 .. code-block:: console
 
-  tox -l
+  (.venv) $ tox -l
 
 You can run all tox tests with::
 
 .. code-block:: console
 
-  tox
+  (.venv) $ tox
 
 You can also specify a test environment to run e.g.::
 
 .. code-block:: console
 
-  tox -e py37
-  tox -e pep8
-  tox -e coverage
+  (.venv) $ tox -e py311
+  (.venv) $ tox -e lint
+  (.venv) $ tox -e coverage
 
-
-.. _Morepath: http://morepath.readthedocs.org
-.. _JSON Web Token draft:
-    http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html
-.. _Auth with JSON Web Tokens:
-    http://jpadilla.com/post/73791304724/auth-with-json-web-tokens
-.. _PyJWT library: http://github.com/progrium/pyjwt
-.. _github: https://help.github.com/articles/generating-an-ssh-key
-.. _virtualenv: https://pypi.python.org/pypi/virtualenv
-.. _flake8: https://pypi.python.org/pypi/flake8
-.. _pyflakes: https://pypi.python.org/pypi/pyflakes
-.. _pep8: http://www.python.org/dev/peps/pep-0008/
-.. _`cyclomatic complexity`:
-    https://en.wikipedia.org/wiki/Cyclomatic_complexity
-.. _pyenv: https://github.com/yyuu/pyenv
+.. _pyenv: https://github.com/pyenv/pyenv
