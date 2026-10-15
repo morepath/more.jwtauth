@@ -1,6 +1,5 @@
 # development
--e '.[crypto,test,coverage,lint]'
-pre-commit
+-e '.[crypto,test,coverage,lint,mypy,pyright]'
 tox >= 4.21.1
 
 # releaser

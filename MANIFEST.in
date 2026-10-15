@@ -1,4 +1,3 @@
-include *.txt *.rst *.yaml
+include *.rst *.txt
 exclude .githooks/pre-commit
-recursive-include src *.py
 recursive-include src/more/jwtauth/tests/keys *
