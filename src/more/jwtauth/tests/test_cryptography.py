@@ -16,9 +16,7 @@ def relative(filepath):
     return os.path.join(os.path.dirname(__file__), filepath)
 
 
-@pytest.mark.skipif(
-    not has_crypto, reason="Not supported without cryptography library"
-)
+@pytest.mark.skipif(not has_crypto, reason="Not supported without cryptography library")
 class TestCryptographyAlgorithms:
     def test_encode_decode_with_es256_as_bytes(self):
         with open(relative("keys/testkey_ec")) as key_priv_file:

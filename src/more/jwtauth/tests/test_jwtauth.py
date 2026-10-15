@@ -1,16 +1,16 @@
 from datetime import timedelta
 
-import morepath
 import pytest
-from morepath import NO_IDENTITY, Identity, Response
 from webob.exc import HTTPProxyAuthenticationRequired
 from webtest import TestApp as Client
 
+import morepath
 from more.jwtauth import (
     ExpiredSignatureError,
     InvalidIssuerError,
     JWTIdentityPolicy,
 )
+from morepath import NO_IDENTITY, Identity, Response
 
 
 def test_jwt_custom_settings():
@@ -62,9 +62,7 @@ def test_encode_decode_with_unicode():
 
 
 def test_encode_decode_with_issuer():
-    identity_policy = JWTIdentityPolicy(
-        master_secret="secret", issuer="Issuer_App"
-    )
+    identity_policy = JWTIdentityPolicy(master_secret="secret", issuer="Issuer_App")
     userid = "user"
 
     extra_claims = {"iss": "Invalid_Issuer_App"}
@@ -189,7 +187,7 @@ def test_login():
     expected_token = identity_policy.encode_jwt(claims_set)
     assert r.headers["Authorization"] == "{} {}".format("JWT", expected_token)
 
-    authtype, token = r.headers["Authorization"].split(" ", 1)
+    _authtype, token = r.headers["Authorization"].split(" ", 1)
     claims_set_decoded = identity_policy.decode_jwt(token)
 
     assert identity_policy.get_userid(claims_set_decoded) == "user"
@@ -227,9 +225,7 @@ def test_login_with_extra_claims():
 
         @request.after
         def remember(response):
-            identity = Identity(
-                username, fullname=fullname, email=email, role=role
-            )
+            identity = Identity(username, fullname=fullname, email=email, role=role)
             request.app.remember_identity(response, request, identity)
 
         return {
@@ -273,7 +269,7 @@ def test_login_with_extra_claims():
         "role": "wizard",
     }
 
-    authtype, token = r.headers["Authorization"].split(" ", 1)
+    _authtype, token = r.headers["Authorization"].split(" ", 1)
     claims_set_decoded = identity_policy.decode_jwt(token)
 
     assert identity_policy.get_userid(claims_set_decoded) == "user"
@@ -297,9 +293,7 @@ def test_jwt_identity_policy():
     class Permission:
         pass
 
-    @App.path(
-        model=Model, path="{id}", variables=lambda model: {"id": model.id}
-    )
+    @App.path(model=Model, path="{id}", variables=lambda model: {"id": model.id})
     def get_model(id):
         return Model(id)
 
@@ -309,7 +303,7 @@ def test_jwt_identity_policy():
 
     @App.view(model=Model, permission=Permission)
     def default(self, request):
-        return "Model: %s" % self.id
+        return f"Model: {self.id}"
 
     @App.identity_policy()
     def get_identity_policy(settings):
@@ -370,9 +364,7 @@ def test_jwt_identity_policy_errors():
     class Permission:
         pass
 
-    @App.path(
-        model=Model, path="{id}", variables=lambda model: {"id": model.id}
-    )
+    @App.path(model=Model, path="{id}", variables=lambda model: {"id": model.id})
     def get_model(id):
         return Model(id)
 
@@ -382,7 +374,7 @@ def test_jwt_identity_policy_errors():
 
     @App.view(model=Model, permission=Permission)
     def default(self, request):
-        return "Model: %s" % self.id
+        return f"Model: {self.id}"
 
     settings = {"master_secret": "sëcret", "leeway": None}
 

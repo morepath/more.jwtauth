@@ -10,11 +10,11 @@ from .main import JWTIdentityPolicy
 from .refresh import verify_refresh_request
 
 __all__ = [
-    "JWTIdentityPolicy",
-    "verify_refresh_request",
     "DecodeError",
     "ExpiredSignatureError",
     "InvalidIssuerError",
     "InvalidTokenError",
+    "JWTIdentityPolicy",
     "MissingRequiredClaimError",
+    "verify_refresh_request",
 ]

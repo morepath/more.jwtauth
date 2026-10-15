@@ -59,9 +59,10 @@ In the later case the algorithm must be an EC*, PS* or RS* version.
 """
 
 from calendar import timegm
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import jwt
+
 from morepath import NO_IDENTITY, Identity
 
 from . import (
@@ -190,10 +191,7 @@ class JWTIdentityPolicy:
         userid = claims.pop("userid")
         claims_set = self.create_claims_set(request, userid, claims)
         token = self.encode_jwt(claims_set)
-        response.headers["Authorization"] = "{} {}".format(
-            self.auth_header_prefix,
-            token,
-        )
+        response.headers["Authorization"] = f"{self.auth_header_prefix} {token}"
 
     def forget(self, response, request):
         """Forget identity on response.
@@ -264,7 +262,7 @@ class JWTIdentityPolicy:
         :param extra_claims: dictionary, containing additional claims or None.
         """
         claims_set = {self.userid_claim: userid}
-        now = timegm(datetime.now(timezone.utc).utctimetuple())
+        now = timegm(datetime.now(UTC).utctimetuple())
         if self.expiration_delta is not None:
             claims_set["exp"] = now + self.expiration_delta
         if self.issuer is not None:
@@ -273,9 +271,7 @@ class JWTIdentityPolicy:
             if self.refresh_delta is not None:
                 claims_set["refresh_until"] = now + self.refresh_delta
             if self.refresh_nonce_handler is not None:
-                claims_set["nonce"] = self.refresh_nonce_handler(
-                    request, userid
-                )
+                claims_set["nonce"] = self.refresh_nonce_handler(request, userid)
         if extra_claims is not None:
             claims_set.update(extra_claims)
         return claims_set
@@ -381,9 +377,7 @@ class JWTIdentityPolicy:
             raise InvalidTokenError("Token not found")
 
         try:
-            claims_set = self.decode_jwt(
-                token, self.verify_expiration_on_refresh
-            )
+            claims_set = self.decode_jwt(token, self.verify_expiration_on_refresh)
 
         # reraise the exceptions to change the error messages
         except DecodeError:
@@ -398,16 +392,13 @@ class JWTIdentityPolicy:
         if self.refresh_nonce_handler is not None:
             if "nonce" not in claims_set:
                 raise MissingRequiredClaimError("nonce")
-            if (
-                self.refresh_nonce_handler(request, userid)
-                != claims_set["nonce"]
-            ):
+            if self.refresh_nonce_handler(request, userid) != claims_set["nonce"]:
                 raise InvalidTokenError("Refresh nonce is not valid")
 
         if self.refresh_delta is not None:
             if "refresh_until" not in claims_set:
                 raise MissingRequiredClaimError("refresh_until")
-            now = timegm(datetime.now(timezone.utc).utctimetuple())
+            now = timegm(datetime.now(UTC).utctimetuple())
             refresh_until = int(claims_set["refresh_until"])
             if refresh_until < (now - self.leeway):
                 raise ExpiredSignatureError("Refresh nonce has expired")

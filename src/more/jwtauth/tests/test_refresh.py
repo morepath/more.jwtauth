@@ -1,11 +1,10 @@
 from calendar import timegm
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-import morepath
 import pytest
-from morepath import Identity
 from webtest import TestApp as Client
 
+import morepath
 from more.jwtauth import (
     DecodeError,
     ExpiredSignatureError,
@@ -15,21 +14,18 @@ from more.jwtauth import (
     verify_refresh_request,
 )
 from more.jwtauth.utils import handler
+from morepath import Identity
 
 
 def test_handler():
     assert handler(None) is None
 
-    refresh_nonce_handler = handler(
-        "more.jwtauth.tests.handler.refresh_nonce_handler"
-    )
+    refresh_nonce_handler = handler("more.jwtauth.tests.handler.refresh_nonce_handler")
     assert refresh_nonce_handler(None, "user") == "__user__"
 
     with pytest.raises(ImportError) as excinfo:
         handler("refresh_nonce_handler")
-    assert "Could not import the name: refresh_nonce_handler" in str(
-        excinfo.value
-    )
+    assert "Could not import the name: refresh_nonce_handler" in str(excinfo.value)
 
 
 def test_create_claims_with_refresh_until_and_nonce():
@@ -45,7 +41,7 @@ def test_create_claims_with_refresh_until_and_nonce():
     userid = "user"
     claims_set = identity_policy.create_claims_set(None, userid)
 
-    now = timegm(datetime.now(timezone.utc).utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     assert claims_set["refresh_until"] >= now + 1
     assert claims_set["refresh_until"] <= now + 3
@@ -97,7 +93,7 @@ def test_refresh_token():
     settings = app.settings.jwtauth.__dict__.copy()
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.now(timezone.utc).utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -116,7 +112,7 @@ def test_refresh_token():
         "userid": "user",
     }
 
-    authtype, token = r.headers["Authorization"].split(" ", 1)
+    _authtype, token = r.headers["Authorization"].split(" ", 1)
     claims_set_decoded = identity_policy.decode_jwt(token)
 
     assert identity_policy.get_userid(claims_set_decoded) == "user"
@@ -173,7 +169,7 @@ def test_refresh_nonce_handler_set_by_decorator():
     settings = app.settings.jwtauth.__dict__.copy()
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.now(timezone.utc).utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -190,7 +186,7 @@ def test_refresh_nonce_handler_set_by_decorator():
         "userid": "user",
     }
 
-    authtype, token = r.headers["Authorization"].split(" ", 1)
+    _authtype, token = r.headers["Authorization"].split(" ", 1)
     claims_set_decoded = identity_policy.decode_jwt(token)
 
     assert identity_policy.get_userid(claims_set_decoded) == "user"
@@ -248,7 +244,7 @@ def test_refresh_token_with_extra_claims():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.now(timezone.utc).utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -275,7 +271,7 @@ def test_refresh_token_with_extra_claims():
         "role": "father",
     }
 
-    authtype, token = r.headers["Authorization"].split(" ", 1)
+    _authtype, token = r.headers["Authorization"].split(" ", 1)
     claims_set_decoded = identity_policy.decode_jwt(token)
 
     assert identity_policy.get_userid(claims_set_decoded) == "user"
@@ -318,9 +314,7 @@ def test_refresh_delta_expired():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    refresh_until = timegm(
-        (datetime.now(timezone.utc) + refresh_delta).utctimetuple()
-    )
+    refresh_until = timegm((datetime.now(UTC) + refresh_delta).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -369,9 +363,7 @@ def test_refresh_not_allowed():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    refresh_until = timegm(
-        (datetime.now(timezone.utc) + refresh_delta).utctimetuple()
-    )
+    refresh_until = timegm((datetime.now(UTC) + refresh_delta).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -432,7 +424,7 @@ def test_refresh_delta_expired_but_with_leeway():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.now(timezone.utc).utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     claims_set = {"sub": "user", "refresh_until": now - 2, "nonce": "__user__"}
 
@@ -448,7 +440,7 @@ def test_refresh_delta_expired_but_with_leeway():
         "userid": "user",
     }
 
-    authtype, token = r.headers["Authorization"].split(" ", 1)
+    _authtype, token = r.headers["Authorization"].split(" ", 1)
     claims_set_decoded = identity_policy.decode_jwt(token)
 
     assert identity_policy.get_userid(claims_set_decoded) == "user"
@@ -487,10 +479,8 @@ def test_expiration_delta_expired_with_verify_expiration_on_refresh():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    exp = timegm((datetime.now(timezone.utc) + expiration_delta).utctimetuple())
-    refresh_until = timegm(
-        (datetime.now(timezone.utc) + refresh_delta).utctimetuple()
-    )
+    exp = timegm((datetime.now(UTC) + expiration_delta).utctimetuple())
+    refresh_until = timegm((datetime.now(UTC) + refresh_delta).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -555,7 +545,7 @@ def test_expiration_delta_expired_without_verify_expiration_on_refresh():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.now(timezone.utc).utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -576,10 +566,8 @@ def test_expiration_delta_expired_without_verify_expiration_on_refresh():
         "userid": "user",
     }
 
-    authtype, token = r.headers["Authorization"].split(" ", 1)
-    claims_set_decoded = identity_policy.decode_jwt(
-        token, verify_expiration=False
-    )
+    _authtype, token = r.headers["Authorization"].split(" ", 1)
+    claims_set_decoded = identity_policy.decode_jwt(token, verify_expiration=False)
 
     assert identity_policy.get_userid(claims_set_decoded) == "user"
 
@@ -623,7 +611,7 @@ def test_refresh_without_refresh_nonce_handler_setting():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.now(timezone.utc).utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -642,7 +630,7 @@ def test_refresh_without_refresh_nonce_handler_setting():
         "userid": "user",
     }
 
-    authtype, token = r.headers["Authorization"].split(" ", 1)
+    _authtype, token = r.headers["Authorization"].split(" ", 1)
     claims_set_decoded = identity_policy.decode_jwt(token)
 
     assert identity_policy.get_userid(claims_set_decoded) == "user"
@@ -748,7 +736,7 @@ def test_refresh_with_invalid_refresh_nonce():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.now(timezone.utc).utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     claims_set = {
         "sub": "user",
@@ -796,7 +784,7 @@ def test_refresh_with_missing_userid_claim():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.now(timezone.utc).utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     claims_set = {"refresh_until": now + 3, "nonce": "__user__"}
 
@@ -882,7 +870,7 @@ def test_refresh_with_missing_nonce_claim():
 
     identity_policy = JWTIdentityPolicy(**settings)
 
-    now = timegm(datetime.now(timezone.utc).utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     claims_set = {"sub": "user", "refresh_until": now + 3}
 
