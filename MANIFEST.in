@@ -1,3 +1,4 @@
-include *.txt *.rst *.yaml .flake8
+include *.txt *.rst *.yaml
+exclude .githooks/pre-commit
 recursive-include src *.py
 recursive-include src/more/jwtauth/tests/keys *
