@@ -66,6 +66,55 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
+    @pytest.mark.parametrize(
+        ("algorithm", "key_type"),
+        [
+            ("ES256K", "secp256k1"),
+            ("EdDSA", "ed25519"),
+            ("EdDSA", "ed448"),
+        ],
+    )
+    def test_encode_decode_with_es256k_and_eddsa(
+        self, algorithm: str, key_type: str
+    ) -> None:
+        from cryptography.hazmat.primitives import serialization
+        from cryptography.hazmat.primitives.asymmetric import ec, ed448, ed25519
+
+        private_key: (
+            ec.EllipticCurvePrivateKey
+            | ed25519.Ed25519PrivateKey
+            | ed448.Ed448PrivateKey
+        )
+        if key_type == "secp256k1":
+            private_key = ec.generate_private_key(ec.SECP256K1())
+        elif key_type == "ed25519":
+            private_key = ed25519.Ed25519PrivateKey.generate()
+        else:
+            private_key = ed448.Ed448PrivateKey.generate()
+
+        private_key_pem = private_key.private_bytes(
+            serialization.Encoding.PEM,
+            serialization.PrivateFormat.PKCS8,
+            serialization.NoEncryption(),
+        ).decode()
+        public_key_pem = (
+            private_key.public_key()
+            .public_bytes(
+                serialization.Encoding.PEM,
+                serialization.PublicFormat.SubjectPublicKeyInfo,
+            )
+            .decode()
+        )
+        identity_policy = JWTIdentityPolicy(
+            algorithm=algorithm,
+            private_key=private_key_pem,
+            public_key=public_key_pem,
+        )
+        claims_set = {"sub": key_type}
+        token = identity_policy.encode_jwt(claims_set)
+
+        assert identity_policy.decode_jwt(token) == claims_set
+
     def test_encode_decode_with_ps256(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="PS256",

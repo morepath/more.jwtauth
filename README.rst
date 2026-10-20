@@ -435,6 +435,9 @@ HS512
 ES256 [1]_
   ECDSA signature algorithm using SHA-256 hash algorithm
 
+ES256K [1]_
+  ECDSA signature algorithm with secp256k1 curve using SHA-256 hash algorithm
+
 ES384 [1]_
   ECDSA signature algorithm using SHA-384 hash algorithm
 
@@ -458,6 +461,11 @@ RS384 [1]_
 
 RS512 [1]_
   RSASSA-PKCS1-v1_5 signature algorithm using SHA-512 hash algorithm
+
+EdDSA [1]_
+  Both Ed25519 signature using SHA-512 and Ed448 signature using SHA-3
+  are supported.
+  Ed25519 and Ed448 provide 128-bit and 224-bit security respectively.
 
 .. [1] The marked algorithms require more.jwtauth to be installed
   with its ``crypto`` dependencies::
