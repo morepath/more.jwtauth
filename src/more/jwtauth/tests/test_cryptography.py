@@ -1,16 +1,13 @@
+from importlib.util import find_spec
+
 import pytest
 
 from more.jwtauth import JWTIdentityPolicy
 
-try:
-    from cryptography.hazmat.primitives.asymmetric import ec  # noqa
-
-    has_crypto = True
-except ImportError:  # pragma: no cover
-    has_crypto = False
+has_crypto = find_spec("cryptography") is not None
 
 
-def relative(filepath):
+def relative(filepath: str) -> str:
     import os
 
     return os.path.join(os.path.dirname(__file__), filepath)
@@ -18,7 +15,7 @@ def relative(filepath):
 
 @pytest.mark.skipif(not has_crypto, reason="Not supported without cryptography library")
 class TestCryptographyAlgorithms:
-    def test_encode_decode_with_es256_as_bytes(self):
+    def test_encode_decode_with_es256_as_bytes(self) -> None:
         with open(relative("keys/testkey_ec")) as key_priv_file:
             private_key = key_priv_file.read()
         with open(relative("keys/testkey_ec.pub")) as key_pub_file:
@@ -33,7 +30,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_es256(self):
+    def test_encode_decode_with_es256(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="ES256",
             private_key_file=relative("keys/testkey_ec"),
@@ -45,7 +42,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_es384(self):
+    def test_encode_decode_with_es384(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="ES384",
             private_key_file=relative("keys/testkey_ec"),
@@ -57,7 +54,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_es512(self):
+    def test_encode_decode_with_es512(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="ES512",
             private_key_file=relative("keys/testkey_ec"),
@@ -69,7 +66,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_ps256(self):
+    def test_encode_decode_with_ps256(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="PS256",
             private_key_file=relative("keys/testkey_rsa"),
@@ -81,7 +78,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_ps384(self):
+    def test_encode_decode_with_ps384(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="PS384",
             private_key_file=relative("keys/testkey_rsa"),
@@ -93,7 +90,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_ps512(self):
+    def test_encode_decode_with_ps512(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="PS512",
             private_key_file=relative("keys/testkey_rsa"),
@@ -105,7 +102,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_rs256(self):
+    def test_encode_decode_with_rs256(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="RS256",
             private_key_file=relative("keys/testkey_rsa"),
@@ -117,7 +114,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_rs384(self):
+    def test_encode_decode_with_rs384(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="RS384",
             private_key_file=relative("keys/testkey_rsa"),
@@ -129,7 +126,7 @@ class TestCryptographyAlgorithms:
 
         assert claims_set_decoded == claims_set
 
-    def test_encode_decode_with_rs512(self):
+    def test_encode_decode_with_rs512(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="RS512",
             private_key_file=relative("keys/testkey_rsa"),

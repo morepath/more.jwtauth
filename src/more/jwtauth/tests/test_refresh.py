@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from calendar import timegm
 from datetime import UTC, datetime, timedelta
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from webtest import TestApp as Client
@@ -14,13 +17,19 @@ from more.jwtauth import (
     verify_refresh_request,
 )
 from more.jwtauth.utils import handler
-from morepath import Identity
+from morepath import Identity, Request, Response
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from morepath.settings import SettingRegistry
 
 
-def test_handler():
+def test_handler() -> None:
     assert handler(None) is None
 
     refresh_nonce_handler = handler("more.jwtauth.tests.handler.refresh_nonce_handler")
+    assert refresh_nonce_handler is not None
     assert refresh_nonce_handler(None, "user") == "__user__"
 
     with pytest.raises(ImportError) as excinfo:
@@ -28,7 +37,7 @@ def test_handler():
     assert "Could not import the name: refresh_nonce_handler" in str(excinfo.value)
 
 
-def test_create_claims_with_refresh_until_and_nonce():
+def test_create_claims_with_refresh_until_and_nonce() -> None:
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
 
     identity_policy = JWTIdentityPolicy(
@@ -39,7 +48,8 @@ def test_create_claims_with_refresh_until_and_nonce():
     )
 
     userid = "user"
-    claims_set = identity_policy.create_claims_set(None, userid)
+    request = Request.blank("/", app=morepath.App())
+    claims_set = identity_policy.create_claims_set(request, userid)
 
     now = timegm(datetime.now(UTC).utctimetuple())
 
@@ -48,7 +58,7 @@ def test_create_claims_with_refresh_until_and_nonce():
     assert claims_set["nonce"] == "__user__"
 
 
-def test_refresh_token():
+def test_refresh_token() -> None:
     class App(morepath.App):
         pass
 
@@ -56,20 +66,20 @@ def test_refresh_token():
         pass
 
     @App.identity_policy()
-    def get_identity_policy(settings):
+    def get_identity_policy(settings: SettingRegistry) -> JWTIdentityPolicy:
         jwtauth_settings = settings.jwtauth.__dict__.copy()
         return JWTIdentityPolicy(**jwtauth_settings)
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> dict[str, str]:
         userid = verify_refresh_request(request)
 
         @request.after
-        def remember(response):
+        def remember(response: Response) -> None:
             identity = Identity(userid)
             request.app.remember_identity(response, request, identity)
 
@@ -79,7 +89,7 @@ def test_refresh_token():
     refresh_delta = 3600
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return {
             "master_secret": "secret",
             "allow_refresh": True,
@@ -118,7 +128,7 @@ def test_refresh_token():
     assert identity_policy.get_userid(claims_set_decoded) == "user"
 
 
-def test_refresh_nonce_handler_set_by_decorator():
+def test_refresh_nonce_handler_set_by_decorator() -> None:
     class App(morepath.App):
         pass
 
@@ -126,20 +136,20 @@ def test_refresh_nonce_handler_set_by_decorator():
         pass
 
     @App.identity_policy()
-    def get_identity_policy(settings):
+    def get_identity_policy(settings: SettingRegistry) -> JWTIdentityPolicy:
         jwtauth_settings = settings.jwtauth.__dict__.copy()
         return JWTIdentityPolicy(**jwtauth_settings)
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> dict[str, str]:
         userid = verify_refresh_request(request)
 
         @request.after
-        def remember(response):
+        def remember(response: Response) -> None:
             identity = Identity(userid)
             request.app.remember_identity(response, request, identity)
 
@@ -148,14 +158,14 @@ def test_refresh_nonce_handler_set_by_decorator():
     refresh_delta = 3600
 
     @App.setting(section="jwtauth", name="refresh_nonce_handler")
-    def get_handler():
-        def refresh_nonce_handler(request, userid):
+    def get_handler() -> Callable[[Request, str], str]:
+        def refresh_nonce_handler(request: Request, userid: str) -> str:
             return "__" + userid + "__"
 
         return refresh_nonce_handler
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return {
             "master_secret": "secret",
             "allow_refresh": True,
@@ -192,7 +202,7 @@ def test_refresh_nonce_handler_set_by_decorator():
     assert identity_policy.get_userid(claims_set_decoded) == "user"
 
 
-def test_refresh_token_with_extra_claims():
+def test_refresh_token_with_extra_claims() -> None:
     class App(morepath.App):
         pass
 
@@ -200,16 +210,16 @@ def test_refresh_token_with_extra_claims():
         pass
 
     @App.identity_policy()
-    def get_identity_policy(settings):
+    def get_identity_policy(settings: SettingRegistry) -> JWTIdentityPolicy:
         jwtauth_settings = settings.jwtauth.__dict__.copy()
         return JWTIdentityPolicy(**jwtauth_settings)
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> dict[str, str]:
         userid = verify_refresh_request(request)
         updated_extra_claims = {
             "fullname": "Harry Potter",
@@ -218,7 +228,7 @@ def test_refresh_token_with_extra_claims():
         }
 
         @request.after
-        def remember(response):
+        def remember(response: Response) -> None:
             identity = Identity(userid, **updated_extra_claims)
             request.app.remember_identity(response, request, identity)
 
@@ -231,7 +241,7 @@ def test_refresh_token_with_extra_claims():
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     refresh_delta = 3600
-    settings = {
+    settings: dict[str, Any] = {
         "master_secret": "secret",
         "allow_refresh": True,
         "refresh_delta": refresh_delta,
@@ -239,7 +249,7 @@ def test_refresh_token_with_extra_claims():
     }
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return settings
 
     identity_policy = JWTIdentityPolicy(**settings)
@@ -284,7 +294,7 @@ def test_refresh_token_with_extra_claims():
     assert identity_policy.get_extra_claims(claims_set_decoded) == extra_claims
 
 
-def test_refresh_delta_expired():
+def test_refresh_delta_expired() -> None:
     class App(morepath.App):
         pass
 
@@ -292,16 +302,16 @@ def test_refresh_delta_expired():
         pass
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> None:
         verify_refresh_request(request)
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     refresh_delta = timedelta(seconds=-2)
-    settings = {
+    settings: dict[str, Any] = {
         "master_secret": "secret",
         "allow_refresh": True,
         "refresh_delta": refresh_delta,
@@ -309,7 +319,7 @@ def test_refresh_delta_expired():
     }
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return settings
 
     identity_policy = JWTIdentityPolicy(**settings)
@@ -333,7 +343,7 @@ def test_refresh_delta_expired():
     assert "Refresh nonce has expired" in str(excinfo.value)
 
 
-def test_refresh_not_allowed():
+def test_refresh_not_allowed() -> None:
     class App(morepath.App):
         pass
 
@@ -341,16 +351,16 @@ def test_refresh_not_allowed():
         pass
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> None:
         verify_refresh_request(request)
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     refresh_delta = timedelta(seconds=3600)
-    settings = {
+    settings: dict[str, Any] = {
         "master_secret": "secret",
         "allow_refresh": False,
         "refresh_delta": refresh_delta,
@@ -358,7 +368,7 @@ def test_refresh_not_allowed():
     }
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return settings
 
     identity_policy = JWTIdentityPolicy(**settings)
@@ -382,7 +392,7 @@ def test_refresh_not_allowed():
     assert "Token refresh is disabled" in str(excinfo.value)
 
 
-def test_refresh_delta_expired_but_with_leeway():
+def test_refresh_delta_expired_but_with_leeway() -> None:
     class App(morepath.App):
         pass
 
@@ -390,27 +400,27 @@ def test_refresh_delta_expired_but_with_leeway():
         pass
 
     @App.identity_policy()
-    def get_identity_policy(settings):
+    def get_identity_policy(settings: SettingRegistry) -> JWTIdentityPolicy:
         jwtauth_settings = settings.jwtauth.__dict__.copy()
         return JWTIdentityPolicy(**jwtauth_settings)
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> dict[str, str]:
         userid = verify_refresh_request(request)
 
         @request.after
-        def remember(response):
+        def remember(response: Response) -> None:
             identity = Identity(userid)
             request.app.remember_identity(response, request, identity)
 
         return {"userid": userid}
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
-    settings = {
+    settings: dict[str, Any] = {
         "master_secret": "secret",
         "leeway": timedelta(seconds=3),
         "allow_refresh": True,
@@ -419,7 +429,7 @@ def test_refresh_delta_expired_but_with_leeway():
     }
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return settings
 
     identity_policy = JWTIdentityPolicy(**settings)
@@ -446,7 +456,7 @@ def test_refresh_delta_expired_but_with_leeway():
     assert identity_policy.get_userid(claims_set_decoded) == "user"
 
 
-def test_expiration_delta_expired_with_verify_expiration_on_refresh():
+def test_expiration_delta_expired_with_verify_expiration_on_refresh() -> None:
     class App(morepath.App):
         pass
 
@@ -454,17 +464,17 @@ def test_expiration_delta_expired_with_verify_expiration_on_refresh():
         pass
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> None:
         verify_refresh_request(request)
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     expiration_delta = timedelta(seconds=-3)
     refresh_delta = timedelta(seconds=3)
-    settings = {
+    settings: dict[str, Any] = {
         "master_secret": "secret",
         "expiration_delta": expiration_delta,
         "allow_refresh": True,
@@ -474,7 +484,7 @@ def test_expiration_delta_expired_with_verify_expiration_on_refresh():
     }
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return settings
 
     identity_policy = JWTIdentityPolicy(**settings)
@@ -500,7 +510,7 @@ def test_expiration_delta_expired_with_verify_expiration_on_refresh():
     assert "Token has expired" in str(excinfo.value)
 
 
-def test_expiration_delta_expired_without_verify_expiration_on_refresh():
+def test_expiration_delta_expired_without_verify_expiration_on_refresh() -> None:
     class App(morepath.App):
         pass
 
@@ -508,20 +518,20 @@ def test_expiration_delta_expired_without_verify_expiration_on_refresh():
         pass
 
     @App.identity_policy()
-    def get_identity_policy(settings):
+    def get_identity_policy(settings: SettingRegistry) -> JWTIdentityPolicy:
         jwtauth_settings = settings.jwtauth.__dict__.copy()
         return JWTIdentityPolicy(**jwtauth_settings)
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> dict[str, str]:
         userid = verify_refresh_request(request)
 
         @request.after
-        def remember(response):
+        def remember(response: Response) -> None:
             identity = Identity(userid)
             request.app.remember_identity(response, request, identity)
 
@@ -530,7 +540,7 @@ def test_expiration_delta_expired_without_verify_expiration_on_refresh():
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     expiration_delta = -3
     refresh_delta = 3
-    settings = {
+    settings: dict[str, Any] = {
         "master_secret": "secret",
         "expiration_delta": expiration_delta,
         "leeway": timedelta(seconds=3),
@@ -540,7 +550,7 @@ def test_expiration_delta_expired_without_verify_expiration_on_refresh():
     }
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return settings
 
     identity_policy = JWTIdentityPolicy(**settings)
@@ -572,7 +582,7 @@ def test_expiration_delta_expired_without_verify_expiration_on_refresh():
     assert identity_policy.get_userid(claims_set_decoded) == "user"
 
 
-def test_refresh_without_refresh_nonce_handler_setting():
+def test_refresh_without_refresh_nonce_handler_setting() -> None:
     class App(morepath.App):
         pass
 
@@ -580,33 +590,33 @@ def test_refresh_without_refresh_nonce_handler_setting():
         pass
 
     @App.identity_policy()
-    def get_identity_policy(settings):
+    def get_identity_policy(settings: SettingRegistry) -> JWTIdentityPolicy:
         jwtauth_settings = settings.jwtauth.__dict__.copy()
         return JWTIdentityPolicy(**jwtauth_settings)
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> dict[str, str]:
         userid = verify_refresh_request(request)
 
         @request.after
-        def remember(response):
+        def remember(response: Response) -> None:
             identity = Identity(userid)
             request.app.remember_identity(response, request, identity)
 
         return {"userid": userid}
 
-    settings = {
+    settings: dict[str, Any] = {
         "master_secret": "secret",
         "allow_refresh": True,
         "refresh_delta": 3,
     }
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return settings
 
     identity_policy = JWTIdentityPolicy(**settings)
@@ -636,7 +646,7 @@ def test_refresh_without_refresh_nonce_handler_setting():
     assert identity_policy.get_userid(claims_set_decoded) == "user"
 
 
-def test_refresh_without_token():
+def test_refresh_without_token() -> None:
     class App(morepath.App):
         pass
 
@@ -644,17 +654,17 @@ def test_refresh_without_token():
         pass
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> None:
         verify_refresh_request(request)
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return {
             "master_secret": "secret",
             "allow_refresh": True,
@@ -670,7 +680,7 @@ def test_refresh_without_token():
     assert "Token not found" in str(excinfo.value)
 
 
-def test_refresh_with_invalid_token():
+def test_refresh_with_invalid_token() -> None:
     class App(morepath.App):
         pass
 
@@ -678,17 +688,17 @@ def test_refresh_with_invalid_token():
         pass
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> None:
         verify_refresh_request(request)
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return {
             "master_secret": "secret",
             "allow_refresh": True,
@@ -707,7 +717,7 @@ def test_refresh_with_invalid_token():
     assert "Token could not be decoded" in str(excinfo.value)
 
 
-def test_refresh_with_invalid_refresh_nonce():
+def test_refresh_with_invalid_refresh_nonce() -> None:
     class App(morepath.App):
         pass
 
@@ -715,15 +725,15 @@ def test_refresh_with_invalid_refresh_nonce():
         pass
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> None:
         verify_refresh_request(request)
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
-    settings = {
+    settings: dict[str, Any] = {
         "master_secret": "secret",
         "allow_refresh": True,
         "refresh_delta": 3,
@@ -731,7 +741,7 @@ def test_refresh_with_invalid_refresh_nonce():
     }
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return settings
 
     identity_policy = JWTIdentityPolicy(**settings)
@@ -755,7 +765,7 @@ def test_refresh_with_invalid_refresh_nonce():
     assert "Refresh nonce is not valid" in str(excinfo.value)
 
 
-def test_refresh_with_missing_userid_claim():
+def test_refresh_with_missing_userid_claim() -> None:
     class App(morepath.App):
         pass
 
@@ -763,15 +773,15 @@ def test_refresh_with_missing_userid_claim():
         pass
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> None:
         verify_refresh_request(request)
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
-    settings = {
+    settings: dict[str, Any] = {
         "master_secret": "secret",
         "allow_refresh": True,
         "refresh_delta": 3,
@@ -779,7 +789,7 @@ def test_refresh_with_missing_userid_claim():
     }
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return settings
 
     identity_policy = JWTIdentityPolicy(**settings)
@@ -799,7 +809,7 @@ def test_refresh_with_missing_userid_claim():
     assert 'Token is missing the "sub" claim' in str(excinfo.value)
 
 
-def test_refresh_with_missing_refresh_until_claim():
+def test_refresh_with_missing_refresh_until_claim() -> None:
     class App(morepath.App):
         pass
 
@@ -807,15 +817,15 @@ def test_refresh_with_missing_refresh_until_claim():
         pass
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> None:
         verify_refresh_request(request)
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
-    settings = {
+    settings: dict[str, Any] = {
         "master_secret": "secret",
         "allow_refresh": True,
         "refresh_delta": 3,
@@ -823,7 +833,7 @@ def test_refresh_with_missing_refresh_until_claim():
     }
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return settings
 
     identity_policy = JWTIdentityPolicy(**settings)
@@ -841,7 +851,7 @@ def test_refresh_with_missing_refresh_until_claim():
     assert 'Token is missing the "refresh_until" claim' in str(excinfo.value)
 
 
-def test_refresh_with_missing_nonce_claim():
+def test_refresh_with_missing_nonce_claim() -> None:
     class App(morepath.App):
         pass
 
@@ -849,15 +859,15 @@ def test_refresh_with_missing_nonce_claim():
         pass
 
     @App.path(model=Refresh, path="refresh")
-    def get_refresh():
+    def get_refresh() -> Refresh:
         return Refresh()
 
     @App.json(model=Refresh)
-    def refresh(self, request):
+    def refresh(self: Refresh, request: Request[App]) -> None:
         verify_refresh_request(request)
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
-    settings = {
+    settings: dict[str, Any] = {
         "master_secret": "secret",
         "allow_refresh": True,
         "refresh_delta": 3,
@@ -865,7 +875,7 @@ def test_refresh_with_missing_nonce_claim():
     }
 
     @App.setting_section(section="jwtauth")
-    def get_jwtauth_settings():
+    def get_jwtauth_settings() -> dict[str, Any]:
         return settings
 
     identity_policy = JWTIdentityPolicy(**settings)

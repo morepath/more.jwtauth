@@ -326,10 +326,10 @@ There are some settings that you can override. Here are all the defaults:
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings():
         return {
-            'master_secret': None,
-            'private_key': None,
+            'master_secret': "",
+            'private_key': "",
             'private_key_file': None,
-            'public_key': None,
+            'public_key': "",
             'public_key_file': None,
             'algorithm': "HS256",
             'expiration_delta': datetime.timedelta(minutes=30),
@@ -347,11 +347,11 @@ The following settings are available:
 
 master_secret
   A secret known only by the server, used for the default HMAC (HS*) algorithm.
-  Default is None.
+  Default is empty string.
 
 private_key
   An Elliptic Curve or an RSA private_key used for the EC (EC*)
-  or RSA (PS*/RS*) algorithms. Default is None.
+  or RSA (PS*/RS*) algorithms. Default is empty string.
 
 private_key_file
   A file holding an Elliptic Curve or an RSA encoded (PEM/DER) private_key.
@@ -359,7 +359,7 @@ private_key_file
 
 public_key
   An Elliptic Curve or an RSA public_key used for the EC (EC*) or RSA (PS*/RS*)
-  algorithms. Default is None.
+  algorithms. Default is empty string.
 
 public_key_file
   A file holding an Elliptic Curve or an RSA encoded (PEM/DER) public_key.

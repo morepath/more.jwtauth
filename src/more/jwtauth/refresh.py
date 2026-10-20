@@ -1,7 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from .main import JWTIdentityPolicy
 
+if TYPE_CHECKING:
+    from morepath import Request
 
-def verify_refresh_request(request):
+
+def verify_refresh_request(request: Request) -> str:
     """
     Wrapper around JWTIdentityPolicy.verify_refresh which verify
     if the request to refresh the token is valid.

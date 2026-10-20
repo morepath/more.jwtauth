@@ -1,7 +1,8 @@
 from importlib import import_module
+from typing import Any
 
 
-def import_dotted_path(path):
+def import_dotted_path(path: str) -> Any:
     """
     Takes a dotted path to a member name in a module, and returns
     the member after importing it.
@@ -14,7 +15,7 @@ def import_dotted_path(path):
         raise ImportError(f"Could not import the name: {path}: {e}")
 
 
-def handler(path):
+def handler(path: str | None) -> Any | None:
     """
     Returns a handler from a dotted path and None if no path given.
     """

@@ -58,8 +58,11 @@ The library takes either a master_secret or private_key/public_key pair.
 In the later case the algorithm must be an EC*, PS* or RS* version.
 """
 
+from __future__ import annotations
+
 from calendar import timegm
 from datetime import UTC, datetime, timedelta
+from typing import TYPE_CHECKING, Any, cast
 
 import jwt
 
@@ -72,6 +75,14 @@ from . import (
     MissingRequiredClaimError,
 )
 from .utils import handler
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from jwt.types import Options
+
+    from morepath import Request, Response
+    from morepath.authentication import NoIdentity
 
 
 class JWTIdentityPolicy:
@@ -86,25 +97,25 @@ class JWTIdentityPolicy:
 
     def __init__(
         self,
-        master_secret=None,
-        private_key=None,
-        private_key_file=None,
-        public_key=None,
-        public_key_file=None,
-        algorithm="HS256",
-        expiration_delta=timedelta(minutes=30),
-        leeway=0,
-        allow_refresh=False,
-        refresh_delta=timedelta(days=7),
-        refresh_nonce_handler=None,
-        verify_expiration_on_refresh=False,
-        issuer=None,
-        auth_header_prefix="JWT",
-        userid_claim="sub",
+        master_secret: str = "",
+        private_key: str = "",
+        private_key_file: str | None = None,
+        public_key: str = "",
+        public_key_file: str | None = None,
+        algorithm: str = "HS256",
+        expiration_delta: timedelta | int | None = timedelta(minutes=30),
+        leeway: timedelta | int = 0,
+        allow_refresh: bool = False,
+        refresh_delta: timedelta | int | None = timedelta(days=7),
+        refresh_nonce_handler: str | Callable[[Request, str], str] | None = None,
+        verify_expiration_on_refresh: bool = False,
+        issuer: str | None = None,
+        auth_header_prefix: str = "JWT",
+        userid_claim: str = "sub",
     ):
         """Initiate the JWTIdentityPolicy with the given settings."""
         _public_key = master_secret
-        if public_key is not None:
+        if public_key:
             _public_key = public_key
         if public_key_file is not None:
             with open(public_key_file) as key_pub_file:
@@ -112,7 +123,7 @@ class JWTIdentityPolicy:
         self.public_key = _public_key
 
         _private_key = master_secret
-        if private_key is not None:
+        if private_key:
             _private_key = private_key
         if private_key_file is not None:
             with open(private_key_file) as key_priv_file:
@@ -122,19 +133,17 @@ class JWTIdentityPolicy:
         self.algorithm = algorithm
 
         if isinstance(expiration_delta, timedelta):
-            expiration_delta = expiration_delta.total_seconds()
+            expiration_delta = int(expiration_delta.total_seconds())
         self.expiration_delta = expiration_delta
 
-        if leeway is None:
-            leeway = 0
-        elif isinstance(leeway, timedelta):
-            leeway = leeway.total_seconds()
+        if isinstance(leeway, timedelta):
+            leeway = int(leeway.total_seconds())
         self.leeway = leeway
 
         self.allow_refresh = allow_refresh
 
         if isinstance(refresh_delta, timedelta):
-            refresh_delta = refresh_delta.total_seconds()
+            refresh_delta = int(refresh_delta.total_seconds())
         self.refresh_delta = refresh_delta
 
         if isinstance(refresh_nonce_handler, str):
@@ -146,7 +155,7 @@ class JWTIdentityPolicy:
         self.auth_header_prefix = auth_header_prefix
         self.userid_claim = userid_claim
 
-    def identify(self, request):
+    def identify(self, request: Request) -> Identity | NoIdentity:
         """Establish what identity this user claims to have from request.
 
         :param request: Request to extract identity information from.
@@ -171,7 +180,9 @@ class JWTIdentityPolicy:
         else:
             return Identity(userid=userid)
 
-    def remember(self, response, request, identity):
+    def remember(
+        self, response: Response, request: Request, identity: Identity
+    ) -> None:
         """Remember identity on response.
 
         Implements ``morepath.App.remember_identity``, which is called
@@ -193,7 +204,7 @@ class JWTIdentityPolicy:
         token = self.encode_jwt(claims_set)
         response.headers["Authorization"] = f"{self.auth_header_prefix} {token}"
 
-    def forget(self, response, request):
+    def forget(self, response: Response, request: Request) -> None:
         """Forget identity on response.
 
         Implements ``morepath.App.forget_identity``, which is called from
@@ -209,7 +220,7 @@ class JWTIdentityPolicy:
         """
         pass
 
-    def decode_jwt(self, token, verify_expiration=True):
+    def decode_jwt(self, token: str, verify_expiration: bool = True) -> dict[str, Any]:
         """Decode a JWTAuth token into its claims set.
 
         This method decodes the given JWT to provide the claims set.  The JWT
@@ -224,7 +235,7 @@ class JWTIdentityPolicy:
         :param verify_expiration: if False the expiration time will not
             be checked.
         """
-        options = {
+        options: Options = {
             "verify_exp": verify_expiration,
         }
         return jwt.decode(
@@ -236,7 +247,12 @@ class JWTIdentityPolicy:
             issuer=self.issuer,
         )
 
-    def create_claims_set(self, request, userid, extra_claims=None):
+    def create_claims_set(
+        self,
+        request: Request | None,
+        userid: str,
+        extra_claims: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Create the claims set based on the userid of the claimed identity,
         the settings and the extra_claims dictionary.
 
@@ -261,7 +277,7 @@ class JWTIdentityPolicy:
         :param userid:  the userid of the claimed identity.
         :param extra_claims: dictionary, containing additional claims or None.
         """
-        claims_set = {self.userid_claim: userid}
+        claims_set: dict[str, Any] = {self.userid_claim: userid}
         now = timegm(datetime.now(UTC).utctimetuple())
         if self.expiration_delta is not None:
             claims_set["exp"] = now + self.expiration_delta
@@ -270,13 +286,13 @@ class JWTIdentityPolicy:
         if self.allow_refresh:
             if self.refresh_delta is not None:
                 claims_set["refresh_until"] = now + self.refresh_delta
-            if self.refresh_nonce_handler is not None:
+            if self.refresh_nonce_handler is not None and request is not None:
                 claims_set["nonce"] = self.refresh_nonce_handler(request, userid)
         if extra_claims is not None:
             claims_set.update(extra_claims)
         return claims_set
 
-    def encode_jwt(self, claims_set):
+    def encode_jwt(self, claims_set: dict[str, Any]) -> str:
         """Encode a JWT token based on the claims_set and the settings.
 
         If available, registry.settings.jwtauth.private_key is used as key.
@@ -296,7 +312,7 @@ class JWTIdentityPolicy:
 
         return token
 
-    def get_userid(self, claims_set):
+    def get_userid(self, claims_set: dict[str, Any]) -> str | None:
         """Extract the userid from a claims set.
 
         Returns userid or None if there is none.
@@ -305,11 +321,11 @@ class JWTIdentityPolicy:
             in the received token.
         """
         if self.userid_claim in claims_set:
-            return claims_set[self.userid_claim]
+            return cast("str", claims_set[self.userid_claim])
         else:
             return None
 
-    def get_extra_claims(self, claims_set):
+    def get_extra_claims(self, claims_set: dict[str, Any]) -> dict[str, Any] | None:
         """Get claims holding extra identity info from the claims set.
 
         Returns a dictionary of extra claims or None if there are none.
@@ -328,7 +344,7 @@ class JWTIdentityPolicy:
             "refresh_until",
             "nonce",
         )
-        extra_claims = {}
+        extra_claims: dict[str, Any] = {}
         for claim in claims_set:
             if claim not in reserved_claims:
                 extra_claims[claim] = claims_set[claim]
@@ -337,7 +353,7 @@ class JWTIdentityPolicy:
 
         return extra_claims
 
-    def get_jwt(self, request):
+    def get_jwt(self, request: Request) -> str | None:
         """Extract the JWT token from the authorisation header of the request.
 
         Returns the JWT token or None, if the token cannot be extracted.
@@ -354,9 +370,9 @@ class JWTIdentityPolicy:
         authtype, token = authorization
         if authtype.lower() != self.auth_header_prefix.lower():
             return None
-        return token
+        return cast("str", token)
 
-    def verify_refresh(self, request):
+    def verify_refresh(self, request: Request) -> str:
         """
         Verify if the request to refresh the token is valid.
         If valid it returns the userid which can be used to create
