@@ -19,6 +19,9 @@ if TYPE_CHECKING:
     from morepath.authentication import NoIdentity
     from morepath.settings import SettingRegistry
 
+TEST_SECRET = "test-secret-that-is-at-least-32-bytes-long"
+UNICODE_TEST_SECRET = "sëcret-that-is-at-least-32-bytes-long"
+
 
 def test_jwt_custom_settings() -> None:
     class App(morepath.App):
@@ -51,7 +54,7 @@ def test_jwt_custom_settings() -> None:
 
 
 def test_encode_decode() -> None:
-    identity_policy = JWTIdentityPolicy(master_secret="secret")
+    identity_policy = JWTIdentityPolicy(master_secret=TEST_SECRET)
     claims_set = {"sub": "user"}
     token = identity_policy.encode_jwt(claims_set)
     claims_set_decoded = identity_policy.decode_jwt(token)
@@ -60,7 +63,7 @@ def test_encode_decode() -> None:
 
 
 def test_encode_decode_with_unicode() -> None:
-    identity_policy = JWTIdentityPolicy(master_secret="sëcret")
+    identity_policy = JWTIdentityPolicy(master_secret=UNICODE_TEST_SECRET)
     claims_set = {"sub": "user"}
     token = identity_policy.encode_jwt(claims_set)
     claims_set_decoded = identity_policy.decode_jwt(token)
@@ -69,7 +72,7 @@ def test_encode_decode_with_unicode() -> None:
 
 
 def test_encode_decode_with_issuer() -> None:
-    identity_policy = JWTIdentityPolicy(master_secret="secret", issuer="Issuer_App")
+    identity_policy = JWTIdentityPolicy(master_secret=TEST_SECRET, issuer="Issuer_App")
     userid = "user"
 
     extra_claims = {"iss": "Invalid_Issuer_App"}
@@ -88,7 +91,7 @@ def test_encode_decode_with_issuer() -> None:
 
 
 def test_create_claims_and_encode_decode_and_get_userid_and_get_extra_claims() -> None:
-    identity_policy = JWTIdentityPolicy(master_secret="secret")
+    identity_policy = JWTIdentityPolicy(master_secret=TEST_SECRET)
     userid = "user"
     extra_claims = {"email": "user@example.com", "role": "admin"}
     claims_set = identity_policy.create_claims_set(None, userid, extra_claims)
@@ -100,7 +103,7 @@ def test_create_claims_and_encode_decode_and_get_userid_and_get_extra_claims() -
 
 
 def test_get_userid_without_userid() -> None:
-    identity_policy = JWTIdentityPolicy(master_secret="secret")
+    identity_policy = JWTIdentityPolicy(master_secret=TEST_SECRET)
     claims_set: dict[str, Any] = {}
     token = identity_policy.encode_jwt(claims_set)
     claims_set_decoded = identity_policy.decode_jwt(token)
@@ -110,7 +113,7 @@ def test_get_userid_without_userid() -> None:
 
 def test_create_claims_and_encode_decode_expired() -> None:
     identity_policy = JWTIdentityPolicy(
-        master_secret="secret", expiration_delta=timedelta(seconds=-2)
+        master_secret=TEST_SECRET, expiration_delta=timedelta(seconds=-2)
     )
     userid = "user"
     claims_set = identity_policy.create_claims_set(None, userid)
@@ -123,7 +126,7 @@ def test_create_claims_and_encode_decode_expired() -> None:
 
 def test_create_claims_and_encode_decode_expired_but_with_leeway() -> None:
     identity_policy = JWTIdentityPolicy(
-        master_secret="secret", expiration_delta=-2, leeway=3
+        master_secret=TEST_SECRET, expiration_delta=-2, leeway=3
     )
     userid = "user"
     claims_set = identity_policy.create_claims_set(None, userid)
@@ -173,7 +176,7 @@ def test_login() -> None:
         }
 
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "expiration_delta": None,
         "refresh_delta": None,
     }
@@ -256,7 +259,7 @@ def test_login_with_extra_claims() -> None:
             "role": role,
         }
 
-    settings: dict[str, Any] = {"master_secret": "secret"}
+    settings: dict[str, Any] = {"master_secret": TEST_SECRET}
 
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings() -> dict[str, Any]:
@@ -343,7 +346,7 @@ def test_jwt_identity_policy() -> None:
         return True
 
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
     }
 
     @App.setting_section(section="jwtauth")
@@ -409,7 +412,7 @@ def test_jwt_identity_policy_errors() -> None:
     def default(self: Model, request: Request[App]) -> str:
         return f"Model: {self.id}"
 
-    settings: dict[str, Any] = {"master_secret": "sëcret", "leeway": None}
+    settings: dict[str, Any] = {"master_secret": UNICODE_TEST_SECRET, "leeway": None}
 
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings() -> dict[str, Any]:
@@ -472,7 +475,7 @@ def test_jwt_remember() -> None:
         return response
 
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
     }
 
     @App.setting_section(section="jwtauth")

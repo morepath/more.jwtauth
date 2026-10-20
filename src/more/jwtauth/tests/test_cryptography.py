@@ -16,9 +16,9 @@ def relative(filepath: str) -> str:
 @pytest.mark.skipif(not has_crypto, reason="Not supported without cryptography library")
 class TestCryptographyAlgorithms:
     def test_encode_decode_with_es256_as_bytes(self) -> None:
-        with open(relative("keys/testkey_ec")) as key_priv_file:
+        with open(relative("keys/testkey_ec256")) as key_priv_file:
             private_key = key_priv_file.read()
-        with open(relative("keys/testkey_ec.pub")) as key_pub_file:
+        with open(relative("keys/testkey_ec256.pub")) as key_pub_file:
             public_key = key_pub_file.read()
 
         identity_policy = JWTIdentityPolicy(
@@ -33,8 +33,8 @@ class TestCryptographyAlgorithms:
     def test_encode_decode_with_es256(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="ES256",
-            private_key_file=relative("keys/testkey_ec"),
-            public_key_file=relative("keys/testkey_ec.pub"),
+            private_key_file=relative("keys/testkey_ec256"),
+            public_key_file=relative("keys/testkey_ec256.pub"),
         )
         claims_set = {"sub": "user"}
         token = identity_policy.encode_jwt(claims_set)
@@ -45,8 +45,8 @@ class TestCryptographyAlgorithms:
     def test_encode_decode_with_es384(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="ES384",
-            private_key_file=relative("keys/testkey_ec"),
-            public_key_file=relative("keys/testkey_ec.pub"),
+            private_key_file=relative("keys/testkey_ec384"),
+            public_key_file=relative("keys/testkey_ec384.pub"),
         )
         claims_set = {"sub": "user"}
         token = identity_policy.encode_jwt(claims_set)
@@ -57,8 +57,8 @@ class TestCryptographyAlgorithms:
     def test_encode_decode_with_es512(self) -> None:
         identity_policy = JWTIdentityPolicy(
             algorithm="ES512",
-            private_key_file=relative("keys/testkey_ec"),
-            public_key_file=relative("keys/testkey_ec.pub"),
+            private_key_file=relative("keys/testkey_ec512"),
+            public_key_file=relative("keys/testkey_ec512.pub"),
         )
         claims_set = {"sub": "user"}
         token = identity_policy.encode_jwt(claims_set)

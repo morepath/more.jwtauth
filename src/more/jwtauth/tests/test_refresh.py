@@ -24,6 +24,8 @@ if TYPE_CHECKING:
 
     from morepath.settings import SettingRegistry
 
+TEST_SECRET = "test-secret-that-is-at-least-32-bytes-long"
+
 
 def test_handler() -> None:
     assert handler(None) is None
@@ -41,7 +43,7 @@ def test_create_claims_with_refresh_until_and_nonce() -> None:
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
 
     identity_policy = JWTIdentityPolicy(
-        master_secret="secret",
+        master_secret=TEST_SECRET,
         allow_refresh=True,
         refresh_delta=timedelta(seconds=2),
         refresh_nonce_handler=refresh_nonce_handler,
@@ -91,7 +93,7 @@ def test_refresh_token() -> None:
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings() -> dict[str, Any]:
         return {
-            "master_secret": "secret",
+            "master_secret": TEST_SECRET,
             "allow_refresh": True,
             "refresh_delta": refresh_delta,
             "refresh_nonce_handler": refresh_nonce_handler,
@@ -167,7 +169,7 @@ def test_refresh_nonce_handler_set_by_decorator() -> None:
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings() -> dict[str, Any]:
         return {
-            "master_secret": "secret",
+            "master_secret": TEST_SECRET,
             "allow_refresh": True,
             "refresh_delta": refresh_delta,
         }
@@ -242,7 +244,7 @@ def test_refresh_token_with_extra_claims() -> None:
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     refresh_delta = 3600
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "allow_refresh": True,
         "refresh_delta": refresh_delta,
         "refresh_nonce_handler": refresh_nonce_handler,
@@ -312,7 +314,7 @@ def test_refresh_delta_expired() -> None:
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     refresh_delta = timedelta(seconds=-2)
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "allow_refresh": True,
         "refresh_delta": refresh_delta,
         "refresh_nonce_handler": refresh_nonce_handler,
@@ -361,7 +363,7 @@ def test_refresh_not_allowed() -> None:
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     refresh_delta = timedelta(seconds=3600)
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "allow_refresh": False,
         "refresh_delta": refresh_delta,
         "refresh_nonce_handler": refresh_nonce_handler,
@@ -421,7 +423,7 @@ def test_refresh_delta_expired_but_with_leeway() -> None:
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "leeway": timedelta(seconds=3),
         "allow_refresh": True,
         "refresh_delta": -2,
@@ -475,7 +477,7 @@ def test_expiration_delta_expired_with_verify_expiration_on_refresh() -> None:
     expiration_delta = timedelta(seconds=-3)
     refresh_delta = timedelta(seconds=3)
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "expiration_delta": expiration_delta,
         "allow_refresh": True,
         "refresh_delta": refresh_delta,
@@ -541,7 +543,7 @@ def test_expiration_delta_expired_without_verify_expiration_on_refresh() -> None
     expiration_delta = -3
     refresh_delta = 3
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "expiration_delta": expiration_delta,
         "leeway": timedelta(seconds=3),
         "allow_refresh": True,
@@ -610,7 +612,7 @@ def test_refresh_without_refresh_nonce_handler_setting() -> None:
         return {"userid": userid}
 
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "allow_refresh": True,
         "refresh_delta": 3,
     }
@@ -666,7 +668,7 @@ def test_refresh_without_token() -> None:
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings() -> dict[str, Any]:
         return {
-            "master_secret": "secret",
+            "master_secret": TEST_SECRET,
             "allow_refresh": True,
             "refresh_delta": 3,
             "refresh_nonce_handler": refresh_nonce_handler,
@@ -700,7 +702,7 @@ def test_refresh_with_invalid_token() -> None:
     @App.setting_section(section="jwtauth")
     def get_jwtauth_settings() -> dict[str, Any]:
         return {
-            "master_secret": "secret",
+            "master_secret": TEST_SECRET,
             "allow_refresh": True,
             "refresh_delta": 3,
             "refresh_nonce_handler": refresh_nonce_handler,
@@ -734,7 +736,7 @@ def test_refresh_with_invalid_refresh_nonce() -> None:
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "allow_refresh": True,
         "refresh_delta": 3,
         "refresh_nonce_handler": refresh_nonce_handler,
@@ -782,7 +784,7 @@ def test_refresh_with_missing_userid_claim() -> None:
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "allow_refresh": True,
         "refresh_delta": 3,
         "refresh_nonce_handler": refresh_nonce_handler,
@@ -826,7 +828,7 @@ def test_refresh_with_missing_refresh_until_claim() -> None:
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "allow_refresh": True,
         "refresh_delta": 3,
         "refresh_nonce_handler": refresh_nonce_handler,
@@ -868,7 +870,7 @@ def test_refresh_with_missing_nonce_claim() -> None:
 
     refresh_nonce_handler = "more.jwtauth.tests.handler.refresh_nonce_handler"
     settings: dict[str, Any] = {
-        "master_secret": "secret",
+        "master_secret": TEST_SECRET,
         "allow_refresh": True,
         "refresh_delta": 3,
         "refresh_nonce_handler": refresh_nonce_handler,
