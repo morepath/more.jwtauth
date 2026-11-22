@@ -1,10 +1,67 @@
 CHANGES
 =======
 
-0.17 (unreleased)
------------------
+1.0.0 (unreleased)
+------------------
 
-- Nothing changed yet.
+- **New:**
+  Support and test new ES256K and EdDSA algorithms.
+
+- Harden the test keys and secrets according to the
+  current PyJWT specifications.
+
+- Set ``master_secret``, ``private_key`` and ``private_key``
+  default values to empty string (``""``) instead of ``None``.
+
+- Upgrade PyJWT dependency to 2.15.
+
+- Add type annotations and integrate ``mypy`` and ``pyright``.
+
+- Adjust the project setup.
+
+- Switch to ``src-layout`` based file structure.
+
+- Switch to native namespace package defined in PEP 420.
+
+- Add support for Python 3.15.
+
+- Drop support for Python 3.10.
+
+- Support Pypy 3.12. With cryptography versions ``<= 50.0.2`` it runs
+  only without the crypto extra as these versions has no working PyPy
+  3.12 (PyPy 8.0) build. See pyca/cryptography `#15801`_ and `#15852`_.
+
+  .. _#15801: https://github.com/pyca/cryptography/issues/15801
+  .. _#15852: https://github.com/pyca/cryptography/issues/15852
+
+- Switch from black, flake8, isort and pyupgrade to `Ruff linter and formatter`_.
+
+  .. _Ruff linter and formatter: https://docs.astral.sh/ruff
+
+- Replace ``pre-commit`` integration with our custom tracked
+  pre-commit git hook for Ruff checks on staged Python files.
+
+- Fix linting and formatting errors.
+
+- Update ``README.rst``.
+
+- Update CI workflow.
+
+- Adjust the deployment strategy:
+  
+  * Move the Pypi upload from ``zest.release`` to ``gh-actions``.
+
+  * Use ``v`` + version as release tags like ``v1.0.0``.
+
+  * So we still use ``zest.release`` but without publishing to Pypi.
+    The Pypi upload is triggered by pushing the new release tag to GitHub.
+    This happens in the Release workflow in ``.github/workflows/release.yml``.
+    With this workflow we get Trusted Publishing with short-lived OIDC tokens
+    that PyPI issues to one specific repository, workflow file and environment (``pypi``).
+    We also get PEP 740 provenance and can set required reviewers for the environment
+    and a ruleset who can create release tags and trigger releases.
+
+- Make an overall cleanup.
 
 
 0.16 (2026-05-05)
@@ -123,7 +180,7 @@ CHANGES
   * ``refresh_until``: Timestamp until which the token can be refreshed.
   * ``nonce``: The nonce which was returned by ``refresh_nonce_handler``.
 
-  For details see README.rst.
+  For details see ``README.rst``.
 
 - **Removed:** The ``verify_expiration`` setting has been removed as it was
   mainly for custom handling of token refreshing, which is now obsolete.
